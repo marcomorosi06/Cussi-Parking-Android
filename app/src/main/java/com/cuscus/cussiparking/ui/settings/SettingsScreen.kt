@@ -7,6 +7,7 @@
  */
 package com.cuscus.cussiparking.ui.settings
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -22,6 +23,8 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import com.cuscus.cussiparking.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,13 +50,13 @@ import androidx.compose.ui.draw.rotate
 
 enum class MapProvider(val label: String) {
     CARTO("CartoDB (Minimal)"),
-    OSM("OpenStreetMap (Dettaglio)")
+    OSM("OpenStreetMap")
 }
 
-enum class MapThemeMode(val label: String) {
-    SYSTEM("Sistema"),
-    LIGHT("Chiaro"),
-    DARK("Scuro")
+enum class MapThemeMode(@StringRes val labelResId: Int) {
+    SYSTEM(R.string.tema_sistema),
+    LIGHT(R.string.tema_chiaro),
+    DARK(R.string.tema_scuro)
 }
 
 // ─────────────────────────────────────────────
@@ -113,14 +116,14 @@ fun SettingsScreen(
             LargeTopAppBar(
                 title = {
                     Text(
-                        "Impostazioni",
+                        stringResource(R.string.impostazioni),
                         style      = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
                     BouncyIconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.indietro))
                     }
                 },
                 colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -143,15 +146,15 @@ fun SettingsScreen(
             // SEZIONE: SERVER COLLEGATI
             // ══════════════════════════════════════════
             item {
-                SectionHeader(icon = Icons.Default.Storage, title = "SERVER COLLEGATI")
+                SectionHeader(icon = Icons.Default.Storage, title = stringResource(R.string.server_collegati))
             }
 
             if (profiles.isEmpty()) {
                 item {
                     AnimatedEmptyState(
                         icon     = Icons.Outlined.CloudOff,
-                        title    = "Nessun server collegato",
-                        subtitle = "Aggiungi un server per sincronizzare i tuoi veicoli."
+                        title    = stringResource(R.string.nessun_server_collegato),
+                        subtitle = stringResource(R.string.aggiungi_server_per_sincronizzare)
                     )
                 }
             }
@@ -184,7 +187,7 @@ fun SettingsScreen(
                 ) {
                     Icon(Icons.Default.AddLink, contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Aggiungi Server", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.aggiungi_server), fontWeight = FontWeight.SemiBold)
                 }
             }
 
@@ -199,7 +202,7 @@ fun SettingsScreen(
             // SEZIONE: SINCRONIZZAZIONE
             // ══════════════════════════════════════════
             item {
-                SectionHeader(icon = Icons.Default.Sync, title = "SINCRONIZZAZIONE")
+                SectionHeader(icon = Icons.Default.Sync, title = stringResource(R.string.sincronizzazione))
             }
 
             item {
@@ -223,7 +226,7 @@ fun SettingsScreen(
                                         scaleIn(spring(Spring.DampingRatioMediumBouncy)) + fadeIn() togetherWith
                                                 scaleOut() + fadeOut()
                                     },
-                                    label = "offline_icon"
+                                    label = "offlineicon"
                                 ) { offline ->
                                     Icon(
                                         if (offline) Icons.Default.WifiOff else Icons.Default.Wifi,
@@ -242,7 +245,7 @@ fun SettingsScreen(
 
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                "Modalità Offline",
+                                stringResource(R.string.modalit_offline),
                                 style      = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -252,10 +255,10 @@ fun SettingsScreen(
                                     slideInVertically { -it } + fadeIn() togetherWith
                                             slideOutVertically { it } + fadeOut()
                                 },
-                                label = "offline_label"
+                                label = "offlinelabel"
                             ) { offline ->
                                 Text(
-                                    if (offline) "Nessun server contattato" else "Sincronizzazione attiva",
+                                    if (offline) stringResource(R.string.nessun_server_contattato) else stringResource(R.string.sincronizzazione_attiva),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -281,14 +284,14 @@ fun SettingsScreen(
             // SEZIONE: MAPPA
             // ══════════════════════════════════════════
             item {
-                SectionHeader(icon = Icons.Default.Map, title = "MAPPA")
+                SectionHeader(icon = Icons.Default.Map, title = stringResource(R.string.mappa))
             }
 
             item {
                 SettingsCard {
                     Column {
                         Text(
-                            "Centro mappa all'apertura",
+                            stringResource(R.string.centro_mappa_allapertura),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -297,8 +300,8 @@ fun SettingsScreen(
                         ConnectedSegmentControl(
                             options = listOf(
                                 Triple("gps", "GPS", Icons.Default.GpsFixed),
-                                Triple("vehicle", "Veicolo", Icons.Default.DirectionsCar),
-                                Triple("custom", "Custom", Icons.Default.PinDrop)
+                                Triple("vehicle", stringResource(R.string.veicolo), Icons.Default.DirectionsCar),
+                                Triple("custom", stringResource(R.string.custom), Icons.Default.PinDrop)
                             ),
                             selected = mapBehavior,
                             onSelect = { settingsManager.saveMapBehavior(it) }
@@ -367,8 +370,8 @@ fun SettingsScreen(
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        if (hasCoords) "Cambia posizione sulla mappa"
-                                        else "Seleziona sulla mappa",
+                                        if (hasCoords) stringResource(R.string.cambia_posizione_sulla_mappa)
+                                        else stringResource(R.string.seleziona_sulla_mappa),
                                         fontWeight = FontWeight.SemiBold
                                     )
                                 }
@@ -377,7 +380,7 @@ fun SettingsScreen(
 
                                 // Input manuale come alternativa secondaria
                                 Text(
-                                    "oppure inserisci manualmente",
+                                    stringResource(R.string.oppure_inserisci_manualmente),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -392,7 +395,7 @@ fun SettingsScreen(
                                     OutlinedTextField(
                                         value = customLatInput,
                                         onValueChange = { customLatInput = it },
-                                        label = { Text("Lat") },
+                                        label = { Text(stringResource(R.string.lat)) },
                                         leadingIcon = {
                                             Icon(
                                                 Icons.Default.NorthEast,
@@ -407,7 +410,7 @@ fun SettingsScreen(
                                     OutlinedTextField(
                                         value = customLngInput,
                                         onValueChange = { customLngInput = it },
-                                        label = { Text("Lng") },
+                                        label = { Text(stringResource(R.string.lng)) },
                                         leadingIcon = {
                                             Icon(
                                                 Icons.Default.SouthEast,
@@ -436,7 +439,7 @@ fun SettingsScreen(
                                 ) {
                                     Icon(Icons.Default.Save, null, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Salva coordinate")
+                                    Text(stringResource(R.string.salva_coordinate))
                                 }
                             }
                         }
@@ -446,7 +449,7 @@ fun SettingsScreen(
 
                 // Sezione Info & Supporto
                 Text(
-                    "INFO APP",
+                    stringResource(R.string.info_app),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -481,8 +484,8 @@ fun SettingsScreen(
                         }
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Rivedi il tutorial", fontWeight = FontWeight.SemiBold)
-                            Text("Scopri di nuovo come funziona l'app", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.rivedi_il_tutorial), fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.scopri_di_nuovo_come_funziona_lapp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Icon(Icons.Default.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
@@ -591,13 +594,13 @@ private fun CustomLocationMapPicker(
     val pinOffsetY by animateFloatAsState(
         targetValue = if (isMapMoving) -44f else -24f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-        label = "pin_bounce_y"
+        label = "pinbouncey"
     )
 
     val shadowScale by animateFloatAsState(
         targetValue = if (isMapMoving) 0.5f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "shadow_scale"
+        label = "shadowscale"
     )
 
     // ── GESTIONE DINAMICA TILES ──
@@ -639,10 +642,10 @@ private fun CustomLocationMapPicker(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Posizione predefinita", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.posizione_predefinita), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     BouncyIconButton(onClick = onCancel) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Annulla")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.annulla))
                     }
                 },
                 actions = {
@@ -655,7 +658,7 @@ private fun CustomLocationMapPicker(
                                     MapThemeMode.DARK -> Icons.Default.DarkMode
                                     MapThemeMode.SYSTEM -> Icons.Default.BrightnessAuto
                                 },
-                                contentDescription = "Tema Mappa"
+                                contentDescription = stringResource(R.string.tema_mappa)
                             )
                         }
                         DropdownMenu(
@@ -664,7 +667,7 @@ private fun CustomLocationMapPicker(
                         ) {
                             MapThemeMode.entries.forEach { mode ->
                                 DropdownMenuItem(
-                                    text = { Text(mode.label) },
+                                    text = { Text(text = stringResource(id = mode.labelResId)) },
                                     onClick = { mapThemeMode = mode; showThemeMenu = false },
                                     trailingIcon = if (mapThemeMode == mode) { { Icon(Icons.Default.Check, null) } } else null
                                 )
@@ -675,7 +678,7 @@ private fun CustomLocationMapPicker(
                     // Menu Provider
                     Box {
                         IconButton(onClick = { showProviderMenu = true }) {
-                            Icon(Icons.Default.Layers, contentDescription = "Stile Mappa")
+                            Icon(Icons.Default.Layers, contentDescription = stringResource(R.string.stile_mappa))
                         }
                         DropdownMenu(
                             expanded = showProviderMenu,
@@ -745,7 +748,7 @@ private fun CustomLocationMapPicker(
                 // Icona Pin (disegnata sopra, si sposta in alto per poggiare la punta al centro)
                 Icon(
                     Icons.Default.LocationOn,
-                    contentDescription = "Posizione",
+                    contentDescription = stringResource(R.string.posizione),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -795,7 +798,7 @@ private fun CustomLocationMapPicker(
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.Search, contentDescription = "Inserisci coordinate")
+                        Icon(Icons.Default.Search, contentDescription = stringResource(R.string.inserisci_coordinate))
                     }
 
                     // CTA primaria grande ed espressiva
@@ -810,7 +813,7 @@ private fun CustomLocationMapPicker(
                             Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(24.dp))
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                "Usa posizione",
+                                stringResource(R.string.usa_posizione),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -825,14 +828,14 @@ private fun CustomLocationMapPicker(
                 var inputLng by remember { mutableStateOf("") }
                 AlertDialog(
                     onDismissRequest = { showManualInput = false },
-                    title = { Text("Vai alle Coordinate", fontWeight = FontWeight.Bold) },
+                    title = { Text(stringResource(R.string.vai_alle_coordinate), fontWeight = FontWeight.Bold) },
                     shape = RoundedCornerShape(24.dp),
                     text = {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             OutlinedTextField(
                                 value = inputLat,
                                 onValueChange = { inputLat = it },
-                                label = { Text("Latitudine") },
+                                label = { Text(stringResource(R.string.latitudine)) },
                                 leadingIcon = { Icon(Icons.Default.NorthEast, contentDescription = null) },
                                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
                                 shape = RoundedCornerShape(16.dp),
@@ -841,7 +844,7 @@ private fun CustomLocationMapPicker(
                             OutlinedTextField(
                                 value = inputLng,
                                 onValueChange = { inputLng = it },
-                                label = { Text("Longitudine") },
+                                label = { Text(stringResource(R.string.longitudine)) },
                                 leadingIcon = { Icon(Icons.Default.SouthEast, contentDescription = null) },
                                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
                                 shape = RoundedCornerShape(16.dp),
@@ -860,10 +863,10 @@ private fun CustomLocationMapPicker(
                                 }
                             },
                             shape = RoundedCornerShape(12.dp)
-                        ) { Text("Vai") }
+                        ) { Text(stringResource(R.string.vai)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { showManualInput = false }) { Text("Annulla") }
+                        TextButton(onClick = { showManualInput = false }) { Text(stringResource(R.string.annulla)) }
                     }
                 )
             }
@@ -923,9 +926,9 @@ private fun AddServerBottomSheet(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Aggiungi Server", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                Text(stringResource(R.string.aggiungi_server), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
                 Text(
-                    "Dopo aver aggiunto il server, fai il login per collegare il tuo account.",
+                    stringResource(R.string.dopo_aver_aggiunto_il_server_fai_il),
                     style    = MaterialTheme.typography.bodyMedium,
                     color    = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
@@ -935,19 +938,19 @@ private fun AddServerBottomSheet(
                     ExpressiveTextField(
                         value         = labelInput,
                         onValueChange = { labelInput = it },
-                        label         = "Nome (es. Casa, Lavoro)",
+                        label         = stringResource(R.string.nome_es_casa_lavoro),
                         icon          = Icons.Default.Label
                     )
                     ExpressiveTextField(
                         value         = urlInput,
                         onValueChange = { urlInput = it },
-                        label         = "URL Server",
+                        label         = stringResource(R.string.url_server),
                         icon          = Icons.Default.Storage
                     )
                     ExpressiveTextField(
                         value         = emailInput,
                         onValueChange = { emailInput = it },
-                        label         = "Email account",
+                        label         = stringResource(R.string.email_account),
                         icon          = Icons.Default.Email
                     )
                 }
@@ -958,14 +961,14 @@ private fun AddServerBottomSheet(
                     horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Annulla", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.annulla), fontWeight = FontWeight.Bold)
                     }
                     Button(
                         onClick  = { if (isValid) onConfirm(labelInput.trim(), urlInput.trim(), emailInput.trim()) },
                         enabled  = isValid,
                         shape    = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Aggiungi e Accedi", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.aggiungi_e_accedi), fontWeight = FontWeight.Bold)
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -994,7 +997,7 @@ private fun ServerProfileCard(
         else
             MaterialTheme.colorScheme.surfaceContainerHigh,
         animationSpec = tween(400),
-        label         = "card_color"
+        label         = "cardcolor"
     )
 
     ElevatedCard(
@@ -1025,7 +1028,7 @@ private fun ServerProfileCard(
                                 scaleIn(spring(Spring.DampingRatioMediumBouncy)) + fadeIn() togetherWith
                                         scaleOut() + fadeOut()
                             },
-                            label = "cloud_icon"
+                            label = "cloudicon"
                         ) { loggedIn ->
                             Icon(
                                 if (loggedIn) Icons.Default.CloudDone else Icons.Default.CloudOff,
@@ -1059,7 +1062,7 @@ private fun ServerProfileCard(
                 BouncyIconButton(onClick = onRename) {
                     Icon(
                         Icons.Default.Edit,
-                        contentDescription = "Rinomina",
+                        contentDescription = stringResource(R.string.rinomina),
                         tint     = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
@@ -1067,7 +1070,7 @@ private fun ServerProfileCard(
                 BouncyIconButton(onClick = onDelete) {
                     Icon(
                         Icons.Default.Delete,
-                        contentDescription = "Rimuovi",
+                        contentDescription = stringResource(R.string.rimuovi),
                         tint     = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(20.dp)
                     )
@@ -1083,7 +1086,7 @@ private fun ServerProfileCard(
                     slideInVertically { it / 2 } + fadeIn() togetherWith
                             slideOutVertically { -it / 2 } + fadeOut()
                 },
-                label = "status_bar"
+                label = "statusbar"
             ) { loggedIn ->
                 Surface(
                     color = if (loggedIn)
@@ -1113,8 +1116,8 @@ private fun ServerProfileCard(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                if (loggedIn) "Connesso come ${profile.email}"
-                                else "Non connesso (${profile.email})",
+                                if (loggedIn) stringResource(R.string.connesso_come, profile.email)
+                                else stringResource(R.string.non_connesso, profile.email),
                                 style    = MaterialTheme.typography.bodySmall,
                                 color    = if (loggedIn)
                                     MaterialTheme.colorScheme.onSecondaryContainer
@@ -1131,7 +1134,7 @@ private fun ServerProfileCard(
                                     contentPadding  = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
                                 ) {
                                     Text(
-                                        "Elimina account",
+                                        stringResource(R.string.elimina_account),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.error
                                     )
@@ -1141,7 +1144,7 @@ private fun ServerProfileCard(
                                     contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
                                 ) {
                                     Text(
-                                        "Esci",
+                                        stringResource(R.string.esci),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.error
                                     )
@@ -1152,7 +1155,7 @@ private fun ServerProfileCard(
                                 onClick        = onLogin,
                                 contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
                             ) {
-                                Text("Accedi", style = MaterialTheme.typography.labelSmall)
+                                Text(stringResource(R.string.accedi), style = MaterialTheme.typography.labelSmall)
                             }
                         }
                     }
@@ -1176,13 +1179,13 @@ private fun RenameProfileDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         icon             = { Icon(Icons.Default.Edit, contentDescription = null) },
-        title            = { Text("Rinomina Server", fontWeight = FontWeight.Bold) },
+        title            = { Text(stringResource(R.string.rinomina_server), fontWeight = FontWeight.Bold) },
         shape            = RoundedCornerShape(24.dp),
         text             = {
             ExpressiveTextField(
                 value         = newLabel,
                 onValueChange = { newLabel = it },
-                label         = "Nuovo nome",
+                label         = stringResource(R.string.nuovo_nome),
                 icon          = Icons.Default.Label
             )
         },
@@ -1191,10 +1194,10 @@ private fun RenameProfileDialog(
                 onClick  = { if (newLabel.isNotBlank()) onConfirm(newLabel.trim()) },
                 enabled  = newLabel.isNotBlank(),
                 shape    = RoundedCornerShape(12.dp)
-            ) { Text("Salva") }
+            ) { Text(stringResource(R.string.salva)) }
         },
         dismissButton    = {
-            TextButton(onClick = onDismiss) { Text("Annulla") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.annulla)) }
         }
     )
 }
@@ -1221,7 +1224,7 @@ private fun DeleteAccountDialog(
                 tint = MaterialTheme.colorScheme.error
             )
         },
-        title            = { Text("Elimina Account", fontWeight = FontWeight.Bold) },
+        title            = { Text(stringResource(R.string.elimina_account), fontWeight = FontWeight.Bold) },
         shape            = RoundedCornerShape(24.dp),
         text             = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -1230,9 +1233,7 @@ private fun DeleteAccountDialog(
                     color    = MaterialTheme.colorScheme.errorContainer
                 ) {
                     Text(
-                        "Stai per eliminare l'account su '${profile.label}'. " +
-                                "Tutti i veicoli di cui sei l'unico proprietario verranno cancellati. " +
-                                "Verrai rimosso da tutti i veicoli condivisi.",
+                        stringResource(R.string.avviso_eliminazione_account, profile.label),
                         style    = MaterialTheme.typography.bodySmall,
                         color    = MaterialTheme.colorScheme.onErrorContainer,
                         modifier = Modifier.padding(12.dp)
@@ -1242,7 +1243,7 @@ private fun DeleteAccountDialog(
                 OutlinedTextField(
                     value                  = passwordInput,
                     onValueChange          = { passwordInput = it; errorMsg = null },
-                    label                  = { Text("Conferma con la tua password") },
+                    label                  = { Text(stringResource(R.string.conferma_con_la_tua_password)) },
                     leadingIcon            = { Icon(Icons.Default.Lock, contentDescription = null) },
                     visualTransformation   = PasswordVisualTransformation(),
                     singleLine             = true,
@@ -1268,18 +1269,18 @@ private fun DeleteAccountDialog(
                 colors   = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                 shape    = RoundedCornerShape(12.dp)
             ) {
-                AnimatedContent(targetState = isLoading, label = "loading_btn") { loading ->
+                AnimatedContent(targetState = isLoading, label = "loadingbtn") { loading ->
                     if (loading) CircularProgressIndicator(
                         modifier    = Modifier.size(18.dp),
                         color       = MaterialTheme.colorScheme.onError,
                         strokeWidth = 2.dp
                     )
-                    else Text("Elimina Account")
+                    else Text(stringResource(R.string.elimina_account))
                 }
             }
         },
         dismissButton    = {
-            TextButton(onClick = onDismiss, enabled = !isLoading) { Text("Annulla") }
+            TextButton(onClick = onDismiss, enabled = !isLoading) { Text(stringResource(R.string.annulla)) }
         }
     )
 }
@@ -1298,12 +1299,11 @@ private fun RemoveProfileDialog(
         icon             = {
             Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
         },
-        title            = { Text("Rimuovi Server", fontWeight = FontWeight.Bold) },
+        title            = { Text(stringResource(R.string.rimuovi_server), fontWeight = FontWeight.Bold) },
         shape            = RoundedCornerShape(24.dp),
         text             = {
             Text(
-                "Rimuovere \"${profile.label}\" (${profile.serverUrl})? " +
-                        "I veicoli associati verranno rimossi anche dal dispositivo.",
+                stringResource(R.string.avviso_rimozione_server, profile.label, profile.serverUrl),
                 style = MaterialTheme.typography.bodyMedium
             )
         },
@@ -1312,10 +1312,10 @@ private fun RemoveProfileDialog(
                 onClick = onConfirm,
                 colors  = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                 shape   = RoundedCornerShape(12.dp)
-            ) { Text("Rimuovi") }
+            ) { Text(stringResource(R.string.rimuovi)) }
         },
         dismissButton    = {
-            TextButton(onClick = onDismiss) { Text("Annulla") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.annulla)) }
         }
     )
 }
@@ -1366,7 +1366,7 @@ private fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
 // ─────────────────────────────────────────────
 @Composable
 private fun AnimatedEmptyState(icon: ImageVector, title: String, subtitle: String) {
-    val pulse = rememberInfiniteTransition(label = "empty_pulse")
+    val pulse = rememberInfiniteTransition(label = "emptypulse")
     val pulseScale by pulse.animateFloat(
         initialValue  = 0.95f,
         targetValue   = 1.05f,
@@ -1523,7 +1523,7 @@ private fun BouncyIconButton(onClick: () -> Unit, content: @Composable () -> Uni
     val scale by animateFloatAsState(
         targetValue   = if (pressed) 0.78f else 1f,
         animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh),
-        label         = "bouncy_icon"
+        label         = "bouncyicon"
     )
     IconButton(
         onClick  = { pressed = true; onClick() },
@@ -1542,11 +1542,11 @@ fun MadeWithLoveFooter() {
     val mergeProgress by animateFloatAsState(
         targetValue = if (isTriggered) 1f else 0f,
         animationSpec = tween(800, easing = FastOutSlowInEasing),
-        label = "merge_progress"
+        label = "mergeprogress"
     )
 
     // Cuore che pulsa (inizia solo quando l'animazione di fusione è quasi finita)
-    val infiniteTransition = rememberInfiniteTransition(label = "heartbeat_transition")
+    val infiniteTransition = rememberInfiniteTransition(label = "heartbeattransition")
     val heartPulse by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = 1f,
@@ -1566,7 +1566,7 @@ fun MadeWithLoveFooter() {
         } else {
             infiniteRepeatable(tween(100)) // Fallback invisibile
         },
-        label = "heart_pulse"
+        label = "heartpulse"
     )
 
     Row(
@@ -1577,7 +1577,7 @@ fun MadeWithLoveFooter() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            "App fatta con ",
+            stringResource(R.string.app_fatta_con),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -1615,7 +1615,7 @@ fun MadeWithLoveFooter() {
                 val phase2 = (mergeProgress - 0.5f) * 2f // normalizza da 0 a 1
                 Icon(
                     Icons.Default.Favorite,
-                    contentDescription = "Cuore",
+                    contentDescription = stringResource(R.string.cuore),
                     tint = Color(0xFFE63946), // Un bel rosso acceso!
                     modifier = Modifier
                         .size(18.dp)
@@ -1625,14 +1625,14 @@ fun MadeWithLoveFooter() {
         }
 
         Text(
-            " da ",
+            stringResource(R.string.da),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         // Il tuo nome (Clickable per avviare la magia!)
         Text(
-            "marco morosi",
+            stringResource(R.string.marco_morosi),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,

@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import com.cuscus.cussiparking.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -83,7 +85,7 @@ fun UnknownNfcTagBottomSheet(
 
             // ── Intestazione ──────────────────────────────────────────────────
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val pulse = rememberInfiniteTransition(label = "nfc_pulse_unk")
+                val pulse = rememberInfiniteTransition(label = "nfcpulseunk")
                 val pulseScale by pulse.animateFloat(
                     initialValue  = 0.88f,
                     targetValue   = 1.12f,
@@ -108,7 +110,7 @@ fun UnknownNfcTagBottomSheet(
                 Spacer(modifier = Modifier.width(14.dp))
                 Column {
                     Text(
-                        "Tag NFC non associato",
+                        stringResource(R.string.tag_nfc_non_associato),
                         style      = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -138,7 +140,7 @@ fun UnknownNfcTagBottomSheet(
                             modifier = Modifier.size(22.dp))
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            "Nessun veicolo configurato. Aggiungine uno prima di associare un tag.",
+                            stringResource(R.string.nessun_veicolo_configurato_aggiungi),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -146,7 +148,7 @@ fun UnknownNfcTagBottomSheet(
                 }
             } else {
                 Text(
-                    "Seleziona veicolo",
+                    stringResource(R.string.seleziona_veicolo),
                     style      = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold,
                     color      = MaterialTheme.colorScheme.onSurfaceVariant
@@ -195,7 +197,7 @@ fun UnknownNfcTagBottomSheet(
 
             // ── Modalità GPS ──────────────────────────────────────────────────
             Text(
-                "Modalità posizione",
+                stringResource(R.string.modalit_posizione),
                 style      = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.SemiBold,
                 color      = MaterialTheme.colorScheme.onSurfaceVariant
@@ -205,14 +207,14 @@ fun UnknownNfcTagBottomSheet(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 LocationModeChip(
-                    label    = "Ultima nota",
+                    label    = stringResource(R.string.ultima_nota),
                     icon     = Icons.Default.GpsNotFixed,
                     selected = locationMode == "last_known",
                     modifier = Modifier.weight(1f),
                     onClick  = { locationMode = "last_known" }
                 )
                 LocationModeChip(
-                    label    = "GPS preciso",
+                    label    = stringResource(R.string.gps_preciso),
                     icon     = Icons.Default.GpsFixed,
                     selected = locationMode == "precise",
                     modifier = Modifier.weight(1f),
@@ -224,7 +226,7 @@ fun UnknownNfcTagBottomSheet(
             AnimatedContent(
                 targetState = saved,
                 transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(150)) },
-                label = "save_state"
+                label = "savestate"
             ) { isSaved ->
                 if (isSaved) {
                     Surface(
@@ -257,7 +259,7 @@ fun UnknownNfcTagBottomSheet(
                         TextButton(
                             onClick  = closeSheet,
                             modifier = Modifier.weight(1f)
-                        ) { Text("Ignora") }
+                        ) { Text(stringResource(R.string.ignora)) }
 
                         Button(
                             onClick = {
@@ -303,7 +305,7 @@ fun UnknownNfcTagBottomSheet(
                             } else {
                                 Icon(Icons.Default.AddCircle, null, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Associa e salva posizione", fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.associa_e_salva_posizione), fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }

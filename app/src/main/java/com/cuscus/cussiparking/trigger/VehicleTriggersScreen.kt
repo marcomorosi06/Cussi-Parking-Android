@@ -24,6 +24,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import com.cuscus.cussiparking.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -104,7 +106,7 @@ fun VehicleTriggersScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Trigger Automatici", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.trigger_automatici), fontWeight = FontWeight.Bold)
                         Text(
                             viewModel.vehicleName,
                             style = MaterialTheme.typography.bodySmall,
@@ -114,7 +116,7 @@ fun VehicleTriggersScreen(
                 },
                 navigationIcon = {
                     BouncyIconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.indietro))
                     }
                 }
             )
@@ -123,7 +125,7 @@ fun VehicleTriggersScreen(
             ExtendedFloatingActionButton(
                 onClick        = { basePermLauncher.launch(basePermissionsToRequest) },
                 icon           = { Icon(Icons.Default.Add, contentDescription = null) },
-                text           = { Text("Aggiungi trigger", fontWeight = FontWeight.SemiBold) },
+                text           = { Text(stringResource(R.string.aggiungi_trigger), fontWeight = FontWeight.SemiBold) },
                 shape          = RoundedCornerShape(20.dp),
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor   = MaterialTheme.colorScheme.onPrimaryContainer
@@ -147,8 +149,8 @@ fun VehicleTriggersScreen(
             item {
                 InfoBanner(
                     icon    = Icons.Default.AutoMode,
-                    title   = "Parcheggio automatico",
-                    body    = "Quando ti disconnetti da un dispositivo Bluetooth o avvicini il telefono a un tag NFC, la posizione viene salvata automaticamente.",
+                    title   = stringResource(R.string.parcheggio_automatico),
+                    body    = stringResource(R.string.parcheggio_automatico_desc),
                     bgColor = MaterialTheme.colorScheme.secondaryContainer,
                     fgColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -159,9 +161,9 @@ fun VehicleTriggersScreen(
                 item {
                     WarningBanner(
                         icon        = Icons.Default.LocationOff,
-                        title       = "Posizione in background mancante",
-                        body        = "Vai in Impostazioni → App → CussiParking → Permessi → Posizione → \"Consenti sempre\".",
-                        buttonLabel = "Concedi ora",
+                        title       = stringResource(R.string.posizione_in_background_mancante),
+                        body        = stringResource(R.string.vai_in_impostazioni),
+                        buttonLabel = stringResource(R.string.concedi_ora),
                         onButton    = {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                                 bgPermLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
@@ -175,9 +177,9 @@ fun VehicleTriggersScreen(
                 item {
                     WarningBanner(
                         icon        = Icons.Default.BatteryAlert,
-                        title       = "Ottimizzazione batteria attiva",
-                        body        = "Android potrebbe bloccare i trigger automatici. Disabilita l'ottimizzazione per un funzionamento affidabile.",
-                        buttonLabel = "Disabilita",
+                        title       = stringResource(R.string.ottimizzazione_batteria_attiva),
+                        body        = stringResource(R.string.android_potrebbe_bloccare),
+                        buttonLabel = stringResource(R.string.disattiva_ottimizzazione),
                         onButton    = {
                             batterySettingsLauncher.launch(
                                 Intent(
@@ -193,7 +195,7 @@ fun VehicleTriggersScreen(
             // ── Empty state ────────────────────────────
             if (triggers.isEmpty()) {
                 item {
-                    val pulse = rememberInfiniteTransition(label = "trigger_pulse")
+                    val pulse = rememberInfiniteTransition(label = "triggerpulse")
                     val pulseScale by pulse.animateFloat(
                         initialValue  = 0.93f,
                         targetValue   = 1.07f,
@@ -201,7 +203,7 @@ fun VehicleTriggersScreen(
                             tween(1800, easing = FastOutSlowInEasing),
                             RepeatMode.Reverse
                         ),
-                        label = "trigger_pulse_scale"
+                        label = "triggerpulsescale"
                     )
                     Column(
                         modifier                = Modifier
@@ -225,12 +227,12 @@ fun VehicleTriggersScreen(
                             }
                         }
                         Text(
-                            "Nessun trigger configurato",
+                            stringResource(R.string.nessun_trigger_configurato),
                             style      = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            "Premi + per aggiungerne uno.",
+                            stringResource(R.string.premi__per_aggiungerne_uno),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -240,7 +242,7 @@ fun VehicleTriggersScreen(
 
             // ── Sezione WiFi ───────────────────────────
             if (wifiTriggers.isNotEmpty()) {
-                item { SectionLabel(label = "WiFi", color = MaterialTheme.colorScheme.primary) }
+                item { SectionLabel(label = stringResource(R.string.wifi), color = MaterialTheme.colorScheme.primary) }
                 items(wifiTriggers, key = { it.id }) { trigger ->
                     TriggerCard(
                         trigger  = trigger,
@@ -254,7 +256,7 @@ fun VehicleTriggersScreen(
             if (btTriggers.isNotEmpty()) {
                 item {
                     SectionLabel(
-                        label  = "Bluetooth",
+                        label  = stringResource(R.string.bluetooth),
                         color  = MaterialTheme.colorScheme.secondary,
                         topPad = if (wifiTriggers.isNotEmpty()) 8.dp else 0.dp
                     )
@@ -272,7 +274,7 @@ fun VehicleTriggersScreen(
             if (nfcTriggers.isNotEmpty()) {
                 item {
                     SectionLabel(
-                        label  = "NFC",
+                        label  = stringResource(R.string.nfc),
                         color  = MaterialTheme.colorScheme.tertiary,
                         topPad = if (wifiTriggers.isNotEmpty() || btTriggers.isNotEmpty()) 8.dp else 0.dp
                     )
@@ -294,13 +296,10 @@ fun VehicleTriggersScreen(
         AlertDialog(
             onDismissRequest = { showBgLocationRationale = false; showAddDialog = true },
             icon             = { Icon(Icons.Default.LocationOn, null) },
-            title            = { Text("Posizione in background", fontWeight = FontWeight.Bold) },
+            title            = { Text(stringResource(R.string.posizione_in_background), fontWeight = FontWeight.Bold) },
             text             = {
                 Text(
-                    "Per salvare la posizione precisa quando esci dall'auto (con app chiusa), " +
-                            "CussiParking ha bisogno del permesso \"Consenti sempre\".\n\n" +
-                            "Nella schermata successiva seleziona \"Consenti sempre\".\n\n" +
-                            "Senza questo permesso verrà usata l'ultima posizione nota."
+                    stringResource(R.string.spiegazione_permesso_bg)
                 )
             },
             confirmButton    = {
@@ -312,11 +311,11 @@ fun VehicleTriggersScreen(
                         else showAddDialog = true
                     },
                     shape = RoundedCornerShape(12.dp)
-                ) { Text("Concedi") }
+                ) { Text(stringResource(R.string.concedi)) }
             },
             dismissButton    = {
                 TextButton(onClick = { showBgLocationRationale = false; showAddDialog = true }) {
-                    Text("Salta")
+                    Text(stringResource(R.string.salta))
                 }
             },
             shape = RoundedCornerShape(24.dp)
@@ -340,19 +339,19 @@ fun VehicleTriggersScreen(
         AlertDialog(
             onDismissRequest = { triggerToDelete = null },
             icon             = { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error) },
-            title            = { Text("Rimuovi trigger", fontWeight = FontWeight.Bold) },
+            title            = { Text(stringResource(R.string.rimuovi_trigger), fontWeight = FontWeight.Bold) },
             text             = {
-                Text("Rimuovere il trigger \"${trigger.label}\"? La posizione non verrà più salvata automaticamente.")
+                Text(stringResource(R.string.conferma_rimuovi_trigger, trigger.label))
             },
             confirmButton    = {
                 Button(
                     onClick = { viewModel.deleteTrigger(trigger); triggerToDelete = null },
                     colors  = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     shape   = RoundedCornerShape(12.dp)
-                ) { Text("Rimuovi") }
+                ) { Text(stringResource(R.string.rimuovi)) }
             },
             dismissButton    = {
-                TextButton(onClick = { triggerToDelete = null }) { Text("Annulla") }
+                TextButton(onClick = { triggerToDelete = null }) { Text(stringResource(R.string.annulla)) }
             },
             shape = RoundedCornerShape(24.dp)
         )
@@ -362,7 +361,7 @@ fun VehicleTriggersScreen(
     // ── Dialog: scrivi tag NFC (Stile Moneta Animata) ──
     nfcWriteTrigger?.let { trigger ->
         // Animazione di "respiro" per l'attesa del tag
-        val pulse = rememberInfiniteTransition(label = "nfc_pulse")
+        val pulse = rememberInfiniteTransition(label = "nfcpulse")
         val pulseScale by pulse.animateFloat(
             initialValue  = 0.90f,
             targetValue   = 1.10f,
@@ -370,7 +369,7 @@ fun VehicleTriggersScreen(
                 tween(1000, easing = FastOutSlowInEasing),
                 RepeatMode.Reverse
             ),
-            label = "pulse_scale"
+            label = "pulsescale"
         )
 
         AlertDialog(
@@ -396,7 +395,7 @@ fun VehicleTriggersScreen(
             },
             title = {
                 Text(
-                    "Pronto per la scrittura",
+                    stringResource(R.string.pronto_per_la_scrittura),
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -410,7 +409,7 @@ fun VehicleTriggersScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        "Avvicina un tag NFC al retro del telefono per programmare il trigger \"${trigger.label}\".",
+                        stringResource(R.string.avvicina_tag_nfc_param, trigger.label),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -433,7 +432,7 @@ fun VehicleTriggersScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                "Usa un tag vuoto o riscrivibile (es. NTAG213). Mantieni in posizione finché non senti la vibrazione.",
+                                stringResource(R.string.usa_un_tag_vuoto_o_riscrivibile_es_),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -451,7 +450,7 @@ fun VehicleTriggersScreen(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Avvia scrittura", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.avvia_scrittura), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -459,7 +458,7 @@ fun VehicleTriggersScreen(
                     onClick = { nfcWriteTrigger = null },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Annulla")
+                    Text(stringResource(R.string.annulla))
                 }
             },
             shape = RoundedCornerShape(28.dp)
@@ -479,7 +478,7 @@ private fun TriggerCard(
     val isWifi     = trigger.type == "wifi"
     val typeIcon   = if (isWifi) Icons.Default.Wifi else Icons.Default.Bluetooth
     val modeIcon   = if (trigger.locationMode == "precise") Icons.Default.GpsFixed else Icons.Default.GpsNotFixed
-    val modeLabel  = if (trigger.locationMode == "precise") "GPS preciso" else "Ultima posizione nota"
+    val modeLabel  = if (trigger.locationMode == "precise") stringResource(R.string.gps_preciso) else stringResource(R.string.ultima_nota)
 
     val accentColor = if (isWifi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
     val containerColor = if (isWifi) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
@@ -574,7 +573,7 @@ private fun TriggerCard(
             BouncyIconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.DeleteOutline,
-                    contentDescription = "Rimuovi",
+                    contentDescription = stringResource(R.string.rimuovi),
                     tint = MaterialTheme.colorScheme.error
                 )
             }
@@ -595,7 +594,7 @@ private fun NfcTriggerCard(
     onDelete: () -> Unit,
     onWriteTag: () -> Unit
 ) {
-    val modeLabel = if (trigger.locationMode == "precise") "GPS preciso" else "Ultima posizione nota"
+    val modeLabel = if (trigger.locationMode == "precise") stringResource(R.string.gps_preciso) else stringResource(R.string.ultima_nota)
     val cardAlpha = if (trigger.enabled) 1f else 0.55f
 
     ElevatedCard(
@@ -681,7 +680,7 @@ private fun NfcTriggerCard(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    "Scrivi tag",
+                                    stringResource(R.string.scrivi_tag),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     fontWeight = FontWeight.Bold
@@ -700,7 +699,7 @@ private fun NfcTriggerCard(
             BouncyIconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.DeleteOutline,
-                    contentDescription = "Rimuovi",
+                    contentDescription = stringResource(R.string.rimuovi),
                     tint = MaterialTheme.colorScheme.error
                 )
             }
@@ -798,19 +797,19 @@ private fun AddTriggerBottomSheet(
                     Spacer(modifier = Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            "Nuovo trigger",
+                            stringResource(R.string.nuovo_trigger),
                             style      = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Black
                         )
                         Text(
                             when (step) {
-                                1    -> "Tipo di trigger"
+                                1    -> stringResource(R.string.tipo_di_trigger)
                                 2    -> when (selectedType) {
-                                    "wifi"      -> "Rete WiFi"
-                                    "nfc"       -> "Nome tag NFC"
-                                    else        -> "Dispositivo Bluetooth"
+                                    "wifi"      -> stringResource(R.string.rete_wifi)
+                                    "nfc"       -> stringResource(R.string.nome_tag_nfc)
+                                    else        -> stringResource(R.string.dispositivo_bluetooth)
                                 }
-                                3    -> "Modalità posizione"
+                                3    -> stringResource(R.string.modalit_posizione)
                                 else -> ""
                             },
                             style = MaterialTheme.typography.bodySmall,
@@ -830,7 +829,7 @@ private fun AddTriggerBottomSheet(
                 // ══════════════════════════════════════════
                 AnimatedContent(
                     targetState    = step,
-                    label          = "trigger_step",
+                    label          = "triggerstep",
                     modifier       = Modifier
                         .weight(1f)
                         .verticalScroll(scrollState),
@@ -856,7 +855,7 @@ private fun AddTriggerBottomSheet(
                             // STEP 1 — tipo
                             1 -> {
                                 Text(
-                                    "Quale evento vuoi usare come trigger?",
+                                    stringResource(R.string.quale_evento_vuoi_usare_come_trigge),
                                     style    = MaterialTheme.typography.bodyMedium,
                                     color    = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(bottom = 14.dp)
@@ -865,8 +864,8 @@ private fun AddTriggerBottomSheet(
                                 // Bluetooth spostato in alto poiché è l'unico selezionabile
                                 TriggerTypeButton(
                                     icon     = Icons.Default.Bluetooth,
-                                    title    = "Disconnessione Bluetooth",
-                                    subtitle = "Quando ti allontani da un dispositivo BT (es. autoradio)",
+                                    title    = stringResource(R.string.disconnessione_bluetooth),
+                                    subtitle = stringResource(R.string.disconnessione_bluetooth_desc),
                                     selected = selectedType == "bluetooth",
                                     enabled  = true,
                                     onClick  = { selectedType = "bluetooth" }
@@ -876,8 +875,8 @@ private fun AddTriggerBottomSheet(
                                 // WiFi disabilitato con il nuovo flag
                                 TriggerTypeButton(
                                     icon     = Icons.Default.Wifi,
-                                    title    = "Disconnessione WiFi",
-                                    subtitle = "Feature futura.",
+                                    title    = stringResource(R.string.disconnessione_wifi),
+                                    subtitle = stringResource(R.string.feature_futura),
                                     selected = selectedType == "wifi",
                                     enabled  = false, // <--- DISABILITATO QUI
                                     onClick  = { selectedType = "wifi" }
@@ -887,8 +886,8 @@ private fun AddTriggerBottomSheet(
                                 // NFC: tap fisico sul tag
                                 TriggerTypeButton(
                                     icon     = Icons.Default.Nfc,
-                                    title    = "Tag NFC",
-                                    subtitle = "Avvicina il telefono al tag per salvare la posizione manualmente.",
+                                    title    = stringResource(R.string.tag_nfc),
+                                    subtitle = stringResource(R.string.tag_nfc_desc),
                                     selected = selectedType == "nfc",
                                     enabled  = true,
                                     onClick  = { selectedType = "nfc" }
@@ -901,7 +900,7 @@ private fun AddTriggerBottomSheet(
                                     "wifi" -> {
                                         if (currentWifi != null && !showManual) {
                                             SectionLabel(
-                                                label  = "Rete attuale",
+                                                label  = stringResource(R.string.rete_attuale),
                                                 color  = MaterialTheme.colorScheme.primary,
                                                 topPad = 0.dp
                                             )
@@ -916,7 +915,7 @@ private fun AddTriggerBottomSheet(
                                         }
                                         if (wifiNetworks.isNotEmpty() && !showManual) {
                                             SectionLabel(
-                                                label  = "Reti nelle vicinanze",
+                                                label  = stringResource(R.string.reti_nelle_vicinanze),
                                                 color  = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 topPad = 0.dp
                                             )
@@ -935,7 +934,7 @@ private fun AddTriggerBottomSheet(
                                             OutlinedTextField(
                                                 value         = manualInput,
                                                 onValueChange = { manualInput = it; selectedIdentifier = it; selectedLabel = it },
-                                                label         = { Text("Nome rete (SSID)") },
+                                                label         = { Text(stringResource(R.string.nome_rete_ssid)) },
                                                 leadingIcon   = { Icon(Icons.Default.Wifi, null) },
                                                 singleLine    = true,
                                                 modifier      = Modifier.fillMaxWidth(),
@@ -949,7 +948,7 @@ private fun AddTriggerBottomSheet(
                                                 modifier = Modifier.size(15.dp)
                                             )
                                             Spacer(modifier = Modifier.width(4.dp))
-                                            Text(if (showManual) "Mostra lista reti" else "Inserisci manualmente")
+                                            Text(if (showManual) stringResource(R.string.mostra_lista_reti) else stringResource(R.string.inserisci_manualmente))
                                         }
                                     }
 
@@ -972,7 +971,7 @@ private fun AddTriggerBottomSheet(
                                                     )
                                                     Spacer(modifier = Modifier.width(10.dp))
                                                     Text(
-                                                        "Nessun dispositivo Bluetooth accoppiato.\nAccoppia prima il dispositivo nelle impostazioni di sistema.",
+                                                        stringResource(R.string.nessun_dispositivo_bluetooth_accopp),
                                                         style = MaterialTheme.typography.bodySmall,
                                                         color = MaterialTheme.colorScheme.onErrorContainer
                                                     )
@@ -980,7 +979,7 @@ private fun AddTriggerBottomSheet(
                                             }
                                         } else {
                                             SectionLabel(
-                                                label  = "Dispositivi accoppiati",
+                                                label  = stringResource(R.string.dispositivi_accoppiati),
                                                 color  = MaterialTheme.colorScheme.secondary,
                                                 topPad = 0.dp
                                             )
@@ -1018,13 +1017,13 @@ private fun AddTriggerBottomSheet(
                                             }
                                             Spacer(modifier = Modifier.height(16.dp))
                                             Text(
-                                                "Personalizza il tuo Tag",
+                                                stringResource(R.string.personalizza_il_tuo_tag),
                                                 style = MaterialTheme.typography.titleMedium,
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onSurface
                                             )
                                             Text(
-                                                "Scegli un nome per riconoscerlo (es. \"Cruscotto Auto\", \"Portachiavi\").",
+                                                stringResource(R.string.esempi_nomi_tag),
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -1038,7 +1037,7 @@ private fun AddTriggerBottomSheet(
                                                     selectedIdentifier = "nfc_${viewModel.vehicleId}_${it.lowercase().replace(" ", "_")}"
                                                     selectedLabel      = it
                                                 },
-                                                label       = { Text("Nome tag NFC") },
+                                                label       = { Text(stringResource(R.string.nome_tag_nfc)) },
                                                 leadingIcon = { Icon(Icons.Default.Label, null) },
                                                 singleLine  = true,
                                                 modifier    = Modifier.fillMaxWidth(),
@@ -1052,23 +1051,23 @@ private fun AddTriggerBottomSheet(
                             // STEP 3 — modalità GPS
                             3 -> {
                                 Text(
-                                    "Come vuoi rilevare la posizione?",
+                                    stringResource(R.string.come_vuoi_rilevare_la_posizione),
                                     style    = MaterialTheme.typography.bodyMedium,
                                     color    = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(bottom = 14.dp)
                                 )
                                 TriggerTypeButton(
                                     icon     = Icons.Default.GpsFixed,
-                                    title    = "GPS preciso",
-                                    subtitle = "Acquisisce il GPS al momento. Più accurato ma usa più batteria.",
+                                    title    = stringResource(R.string.gps_preciso),
+                                    subtitle = stringResource(R.string.gps_preciso_desc),
                                     selected = selectedMode == "precise",
                                     onClick  = { selectedMode = "precise"; showLastKnownWarning = false }
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 TriggerTypeButton(
                                     icon     = Icons.Default.GpsNotFixed,
-                                    title    = "Ultima posizione nota",
-                                    subtitle = "Veloce e risparmia batteria. Usa l'ultima posizione registrata.",
+                                    title    = stringResource(R.string.ultima_nota),
+                                    subtitle = stringResource(R.string.ultima_nota_desc),
                                     selected = selectedMode == "last_known",
                                     onClick  = { selectedMode = "last_known"; showLastKnownWarning = true }
                                 )
@@ -1096,7 +1095,7 @@ private fun AddTriggerBottomSheet(
                                             )
                                             Spacer(modifier = Modifier.width(8.dp))
                                             Text(
-                                                "La posizione salvata potrebbe essere imprecisa: viene usata l'ultima rilevata dal telefono, che potrebbe risalire a ore prima.",
+                                                stringResource(R.string.la_posizione_salvata_potrebbe_esser),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onTertiaryContainer
                                             )
@@ -1126,11 +1125,11 @@ private fun AddTriggerBottomSheet(
                         TextButton(onClick = { step-- }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Indietro", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.indietro), fontWeight = FontWeight.Bold)
                         }
                     } else {
                         TextButton(onClick = onDismiss) {
-                            Text("Annulla", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.annulla), fontWeight = FontWeight.Bold)
                         }
                     }
                     when (step) {
@@ -1138,18 +1137,18 @@ private fun AddTriggerBottomSheet(
                             onClick  = { if (selectedType.isNotEmpty()) step = 2 },
                             enabled  = selectedType.isNotEmpty(),
                             shape    = RoundedCornerShape(12.dp)
-                        ) { Text("Avanti", fontWeight = FontWeight.Bold) }
+                        ) { Text(stringResource(R.string.avanti), fontWeight = FontWeight.Bold) }
 
                         2 -> Button(
                             onClick  = { if (selectedIdentifier.isNotEmpty()) step = 3 },
                             enabled  = selectedIdentifier.isNotEmpty(),
                             shape    = RoundedCornerShape(12.dp)
-                        ) { Text("Avanti", fontWeight = FontWeight.Bold) }
+                        ) { Text(stringResource(R.string.avanti), fontWeight = FontWeight.Bold) }
 
                         3 -> Button(
                             onClick = { onConfirm(selectedType, selectedIdentifier, selectedLabel, selectedMode) },
                             shape   = RoundedCornerShape(12.dp)
-                        ) { Text("Aggiungi", fontWeight = FontWeight.Bold) }
+                        ) { Text(stringResource(R.string.aggiungi), fontWeight = FontWeight.Bold) }
                     }
                 }
             }
@@ -1224,7 +1223,7 @@ private fun TriggerTypeButton(
     val scale by animateFloatAsState(
         targetValue   = if (selected && enabled) 1.02f else 1f,
         animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium),
-        label         = "type_btn_scale"
+        label         = "typebtnscale"
     )
     val containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer
     else MaterialTheme.colorScheme.surfaceContainerHigh

@@ -73,7 +73,7 @@ fun AuthScreen(
                             slideInVertically { -it } + fadeIn() togetherWith
                                     slideOutVertically { it } + fadeOut()
                         },
-                        label = "topbar_title"
+                        label = "topbartitle"
                     ) { label ->
                         Column {
                             Text(
@@ -93,13 +93,13 @@ fun AuthScreen(
                 navigationIcon = {
                     if (onNavigateBack != null) {
                         BouncyIconButton(onClick = onNavigateBack) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Indietro")
+                            Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.indietro))
                         }
                     }
                 },
                 actions = {
                     BouncyIconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "Impostazioni")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.impostazioni))
                     }
                 }
             )
@@ -126,7 +126,7 @@ fun AuthScreen(
                     )
                 ) + fadeIn()
             ) {
-                val pulseAnim = rememberInfiniteTransition(label = "hero_pulse")
+                val pulseAnim = rememberInfiniteTransition(label = "heropulse")
                 val pulseScale by pulseAnim.animateFloat(
                     initialValue = 0.97f,
                     targetValue = 1.03f,
@@ -237,7 +237,7 @@ fun AuthScreen(
                                 transitionSpec = {
                                     scaleIn(bouncySpring) + fadeIn() togetherWith scaleOut() + fadeOut()
                                 },
-                                label = "offline_icon"
+                                label = "offlineicon"
                             ) { offline ->
                                 Icon(
                                     if (offline) Icons.Default.WifiOff else Icons.Default.Wifi,
@@ -262,7 +262,7 @@ fun AuthScreen(
                                         slideInVertically { -it } + fadeIn() togetherWith
                                                 slideOutVertically { it } + fadeOut()
                                     },
-                                    label = "offline_sub"
+                                    label = "offlinesub"
                                 ) { offline ->
                                     Text(
                                         if (offline) "Nessun server necessario" else "Connessione al server attiva",
@@ -351,7 +351,7 @@ fun AuthScreen(
             val btnScale by animateFloatAsState(
                 targetValue = if (isLoading) 0.96f else 1f,
                 animationSpec = bouncySpring,
-                label = "btn_scale"
+                label = "btnscale"
             )
             Button(
                 onClick = {
@@ -370,7 +370,7 @@ fun AuthScreen(
                     transitionSpec = {
                         scaleIn(bouncySpring) + fadeIn() togetherWith scaleOut() + fadeOut()
                     },
-                    label = "btn_content"
+                    label = "btncontent"
                 ) { (loading, offline) ->
                     if (loading) {
                         CircularProgressIndicator(
@@ -465,12 +465,12 @@ fun RegisterScreen(
                 },
                 navigationIcon = {
                     BouncyIconButton(onClick = onNavigateToLogin) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Login")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.login))
                     }
                 },
                 actions = {
                     BouncyIconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "Impostazioni")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.impostazioni))
                     }
                 }
             )
@@ -560,7 +560,7 @@ fun RegisterScreen(
                 FormField(
                     value = username,
                     onValueChange = { username = it.trim() },
-                    label = "Username",
+                    label = stringResource(R.string.username),
                     icon = Icons.Default.AlternateEmail,
                     supportingText = if (usernameError) "3-20 caratteri, lettere/numeri/underscore"
                     else "Lettere, numeri, underscore. 3-20 caratteri.",
@@ -664,7 +664,7 @@ fun RegisterScreen(
             val btnScale by animateFloatAsState(
                 targetValue = if (isLoading) 0.96f else 1f,
                 animationSpec = bouncySpring,
-                label = "reg_btn_scale"
+                label = "regbtnscale"
             )
             Button(
                 onClick = {
@@ -692,7 +692,7 @@ fun RegisterScreen(
                     transitionSpec = {
                         scaleIn(bouncySpring) + fadeIn() togetherWith scaleOut() + fadeOut()
                     },
-                    label = "reg_btn_content"
+                    label = "regbtncontent"
                 ) { loading ->
                     if (loading) {
                         CircularProgressIndicator(
@@ -786,7 +786,7 @@ private fun BouncyIconButton(onClick: () -> Unit, content: @Composable () -> Uni
     val scale by animateFloatAsState(
         targetValue = if (pressed) 0.78f else 1f,
         animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh),
-        label = "bouncy_icon"
+        label = "bouncyicon"
     )
     LaunchedEffect(pressed) {
         if (pressed) {

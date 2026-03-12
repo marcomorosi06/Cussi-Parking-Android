@@ -46,10 +46,10 @@ object ParkingNotificationHelper {
         nm.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_TRIGGER,
-                "Parcheggio Automatico",
+                context.getString(R.string.channel_trigger_name),
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "Notifica quando un trigger (BT, NFC, WiFi) salva la posizione"
+                description = context.getString(R.string.channel_trigger_desc)
                 enableVibration(true)
             }
         )
@@ -58,10 +58,10 @@ object ParkingNotificationHelper {
         nm.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_MANUAL,
-                "Parcheggio Manuale",
+                context.getString(R.string.channel_manual_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Conferma silenziosa per salvataggi manuali da mappa o GPS"
+                description = context.getString(R.string.channel_manual_desc)
             }
         )
 
@@ -69,10 +69,10 @@ object ParkingNotificationHelper {
         nm.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_FOREGROUND,
-                "Rilevamento Posizione",
+                context.getString(R.string.channel_fg_name),
                 NotificationManager.IMPORTANCE_MIN
             ).apply {
-                description = "Notifica di servizio durante il rilevamento della posizione"
+                description = context.getString(R.string.channel_fg_desc)
                 setShowBadge(false)
             }
         )
@@ -100,48 +100,48 @@ object ParkingNotificationHelper {
                 channel  = CHANNEL_TRIGGER,
                 id       = NOTIF_BASE_BT + vehicleId,
                 icon     = android.R.drawable.stat_sys_data_bluetooth,
-                title    = "🔵 $vehicleName parcheggiata",
-                body     = "Bluetooth disconnesso: $triggerLabel"
+                title    = context.getString(R.string.notif_title_parked, vehicleName),
+                body     = context.getString(R.string.notif_body_bt, triggerLabel)
             )
 
             SOURCE_NFC -> NotifConfig(
                 channel  = CHANNEL_TRIGGER,
                 id       = NOTIF_BASE_NFC + vehicleId,
                 icon     = R.drawable.ic_launcher_foreground,
-                title    = "📡 $vehicleName parcheggiata",
-                body     = "Tag NFC rilevato"
+                title    = context.getString(R.string.notif_title_parked, vehicleName),
+                body     = context.getString(R.string.notif_body_nfc)
             )
 
             SOURCE_WIFI -> NotifConfig(
                 channel  = CHANNEL_TRIGGER,
                 id       = NOTIF_BASE_WIFI + vehicleId,
                 icon     = R.drawable.ic_launcher_foreground,
-                title    = "📶 $vehicleName parcheggiata",
-                body     = "WiFi disconnesso: $triggerLabel"
+                title    = context.getString(R.string.notif_title_parked, vehicleName),
+                body     = context.getString(R.string.notif_body_wifi, triggerLabel)
             )
 
             SOURCE_GPS -> NotifConfig(
                 channel  = CHANNEL_MANUAL,
                 id       = NOTIF_BASE_GPS + vehicleId,
                 icon     = android.R.drawable.ic_menu_mylocation,
-                title    = "📍 $vehicleName salvata",
-                body     = "Posizione GPS registrata"
+                title    = context.getString(R.string.notif_title_saved, vehicleName),
+                body     = context.getString(R.string.notif_body_gps)
             )
 
             SOURCE_MANUAL -> NotifConfig(
                 channel  = CHANNEL_MANUAL,
                 id       = NOTIF_BASE_MANUAL + vehicleId,
                 icon     = android.R.drawable.ic_menu_mapmode,
-                title    = "🗺️ $vehicleName salvata",
-                body     = "Posizione impostata manualmente dalla mappa"
+                title    = context.getString(R.string.notif_title_saved, vehicleName),
+                body     = context.getString(R.string.notif_body_manual)
             )
 
             else -> NotifConfig(
                 channel  = CHANNEL_TRIGGER,
                 id       = NOTIF_BASE_BT + vehicleId,
                 icon     = R.drawable.ic_launcher_foreground,
-                title    = "✅ $vehicleName parcheggiata",
-                body     = "Posizione salvata automaticamente"
+                title    = context.getString(R.string.notif_title_parked, vehicleName),
+                body     = context.getString(R.string.notif_body_auto)
             )
         }
 
@@ -183,7 +183,7 @@ object ParkingNotificationHelper {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_TRIGGER)
             .setSmallIcon(android.R.drawable.stat_notify_error)
-            .setContentTitle("⚠️ Impossibile salvare $vehicleName")
+            .setContentTitle(context.getString(R.string.notif_title_error, vehicleName))
             .setContentText(reason)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

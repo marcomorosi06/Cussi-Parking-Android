@@ -20,6 +20,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import com.cuscus.cussiparking.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -70,7 +72,7 @@ fun VehicleMembersScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Gestione Membri", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.gestione_membri), fontWeight = FontWeight.Bold)
                         Text(
                             viewModel.vehicleName,
                             style = MaterialTheme.typography.bodySmall,
@@ -80,12 +82,12 @@ fun VehicleMembersScreen(
                 },
                 navigationIcon = {
                     BouncyIconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.indietro))
                     }
                 },
                 actions = {
                     BouncyIconButton(onClick = { viewModel.fetchMembers() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Aggiorna")
+                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.aggiorna))
                     }
                 }
             )
@@ -100,12 +102,12 @@ fun VehicleMembersScreen(
                         contentColor   = MaterialTheme.colorScheme.onSecondaryContainer,
                         shape          = RoundedCornerShape(14.dp)
                     ) {
-                        Icon(Icons.Default.Share, contentDescription = "Genera codice invito")
+                        Icon(Icons.Default.Share, contentDescription = stringResource(R.string.genera_codice_invito))
                     }
                     ExtendedFloatingActionButton(
                         onClick        = { showAddMemberDialog = true },
                         icon           = { Icon(Icons.Default.PersonAdd, contentDescription = null) },
-                        text           = { Text("Aggiungi", fontWeight = FontWeight.SemiBold) },
+                        text           = { Text(stringResource(R.string.aggiungi), fontWeight = FontWeight.SemiBold) },
                         shape          = RoundedCornerShape(20.dp),
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor   = MaterialTheme.colorScheme.onPrimaryContainer
@@ -129,7 +131,7 @@ fun VehicleMembersScreen(
                     ) {
                         CircularProgressIndicator()
                         Text(
-                            "Caricamento membri…",
+                            stringResource(R.string.caricamento_membri),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -138,7 +140,7 @@ fun VehicleMembersScreen(
 
                 // ── Empty state ────────────────────────────
                 members.isEmpty() -> {
-                    val pulse = rememberInfiniteTransition(label = "members_pulse")
+                    val pulse = rememberInfiniteTransition(label = "memberspulse")
                     val pulseScale by pulse.animateFloat(
                         initialValue  = 0.93f,
                         targetValue   = 1.07f,
@@ -146,7 +148,7 @@ fun VehicleMembersScreen(
                             tween(1800, easing = FastOutSlowInEasing),
                             RepeatMode.Reverse
                         ),
-                        label = "pulse_scale"
+                        label = "pulsescale"
                     )
                     Column(
                         modifier            = Modifier
@@ -170,13 +172,13 @@ fun VehicleMembersScreen(
                             }
                         }
                         Text(
-                            "Solo tu hai accesso a questo veicolo.",
+                            stringResource(R.string.solo_tu_hai_accesso_a_questo_veicol),
                             style      = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             textAlign  = TextAlign.Center
                         )
                         if (isOwner) Text(
-                            "Usa il tasto + per aggiungere qualcuno.",
+                            stringResource(R.string.usa_il_tasto__per_aggiungere_qualcu),
                             style     = MaterialTheme.typography.bodyMedium,
                             color     = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -199,7 +201,7 @@ fun VehicleMembersScreen(
                         // Contatore accessi
                         item {
                             Text(
-                                "${members.size} ${if (members.size == 1) "persona ha" else "persone hanno"} accesso",
+                                if (members.size == 1) stringResource(R.string.persona_accesso, members.size) else stringResource(R.string.persone_accesso, members.size),
                                 style    = MaterialTheme.typography.bodyMedium,
                                 color    = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(bottom = 4.dp)
@@ -209,7 +211,7 @@ fun VehicleMembersScreen(
                         if (owners.isNotEmpty()) {
                             item {
                                 SectionLabel(
-                                    text  = "Proprietari",
+                                    text  = stringResource(R.string.proprietari),
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
@@ -227,7 +229,7 @@ fun VehicleMembersScreen(
                         if (regularMembers.isNotEmpty()) {
                             item {
                                 SectionLabel(
-                                    text     = "Membri",
+                                    text     = stringResource(R.string.membri),
                                     color    = MaterialTheme.colorScheme.secondary,
                                     topPad   = if (owners.isNotEmpty()) 12.dp else 0.dp
                                 )
@@ -284,19 +286,19 @@ fun VehicleMembersScreen(
         AlertDialog(
             onDismissRequest = { memberToDelete = null },
             icon             = { Icon(Icons.Default.PersonRemove, null, tint = MaterialTheme.colorScheme.error) },
-            title            = { Text("Rimuovi Membro", fontWeight = FontWeight.Bold) },
+            title            = { Text(stringResource(R.string.rimuovi_membro), fontWeight = FontWeight.Bold) },
             text             = {
-                Text("Rimuovere @${member.username} da ${viewModel.vehicleName}? Non potrà più vedere questo veicolo.")
+                Text(stringResource(R.string.rimuovere_membro_desc, member.username, viewModel.vehicleName))
             },
             confirmButton    = {
                 Button(
                     onClick = { viewModel.removeMember(member); memberToDelete = null },
                     colors  = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     shape   = RoundedCornerShape(12.dp)
-                ) { Text("Rimuovi") }
+                ) { Text(stringResource(R.string.rimuovi)) }
             },
             dismissButton    = {
-                TextButton(onClick = { memberToDelete = null }) { Text("Annulla") }
+                TextButton(onClick = { memberToDelete = null }) { Text(stringResource(R.string.annulla)) }
             },
             shape = RoundedCornerShape(24.dp)
         )
@@ -306,7 +308,7 @@ fun VehicleMembersScreen(
     memberToChangeRole?.let { member ->
         val isCurrentlyOwner = member.role == "owner"
         val newRole          = if (isCurrentlyOwner) "member" else "owner"
-        val actionLabel      = if (isCurrentlyOwner) "Retrocedi a Membro" else "Promuovi a Proprietario"
+        val actionLabel      = if (isCurrentlyOwner) stringResource(R.string.retrocedi_membro) else stringResource(R.string.promuovi_proprietario)
 
         AlertDialog(
             onDismissRequest = { memberToChangeRole = null },
@@ -322,9 +324,9 @@ fun VehicleMembersScreen(
             text             = {
                 Text(
                     if (isCurrentlyOwner)
-                        "@${member.username} non sarà più proprietario di ${viewModel.vehicleName} e diventerà un membro ordinario."
+                        stringResource(R.string.retrocedi_membro_desc, member.username, viewModel.vehicleName)
                     else
-                        "@${member.username} diventerà proprietario di ${viewModel.vehicleName} e potrà aggiungere e rimuovere altri membri."
+                        stringResource(R.string.promuovi_membro_desc, member.username, viewModel.vehicleName)
                 )
             },
             confirmButton    = {
@@ -338,7 +340,7 @@ fun VehicleMembersScreen(
                 ) { Text(actionLabel) }
             },
             dismissButton    = {
-                TextButton(onClick = { memberToChangeRole = null }) { Text("Annulla") }
+                TextButton(onClick = { memberToChangeRole = null }) { Text(stringResource(R.string.annulla)) }
             },
             shape = RoundedCornerShape(24.dp)
         )
@@ -395,9 +397,9 @@ private fun AddMemberBottomSheet(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Aggiungi Membro", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                Text(stringResource(R.string.aggiungi_membro), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
                 Text(
-                    "Inserisci l'username dell'utente da aggiungere a ${"\u201c"}${"\u201d"}.",
+                    stringResource(R.string.inserisci_username_aggiungere),
                     style  = MaterialTheme.typography.bodyMedium,
                     color  = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
@@ -405,7 +407,7 @@ private fun AddMemberBottomSheet(
                 OutlinedTextField(
                     value         = input,
                     onValueChange = { input = it.trim() },
-                    label         = { Text("Username") },
+                    label         = { Text(stringResource(R.string.username)) },
                     leadingIcon   = { Icon(Icons.Default.AlternateEmail, null) },
                     singleLine    = true,
                     modifier      = Modifier.fillMaxWidth(),
@@ -417,7 +419,7 @@ private fun AddMemberBottomSheet(
                     horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Annulla", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.annulla), fontWeight = FontWeight.Bold)
                     }
                     Button(
                         onClick  = { if (input.isNotBlank()) onConfirm(input) },
@@ -426,7 +428,7 @@ private fun AddMemberBottomSheet(
                     ) {
                         AnimatedContent(
                             targetState  = isLoading,
-                            label        = "add_btn",
+                            label        = "addbtn",
                             transitionSpec = { fadeIn(tween(160)) togetherWith fadeOut(tween(160)) }
                         ) { loading ->
                             if (loading) CircularProgressIndicator(
@@ -434,7 +436,7 @@ private fun AddMemberBottomSheet(
                                 color       = MaterialTheme.colorScheme.onPrimary,
                                 strokeWidth = 2.dp
                             )
-                            else Text("Aggiungi", fontWeight = FontWeight.Bold)
+                            else Text(stringResource(R.string.aggiungi), fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -458,14 +460,7 @@ private fun InviteCodeBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val shareText = buildString {
-        appendLine("Ti invito a seguire $vehicleName su CussiParking!")
-        appendLine()
-        appendLine("1. Apri l'app e collegati al server: $serverUrl")
-        appendLine("2. Usa il codice invito: $inviteCode")
-        appendLine()
-        append("Il codice è valido 24 ore e può essere usato una sola volta.")
-    }
+    val shareText = stringResource(R.string.testo_condivisione_invito, vehicleName, serverUrl, inviteCode)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -506,9 +501,9 @@ private fun InviteCodeBottomSheet(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Codice Invito", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                Text(stringResource(R.string.codice_invito), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
                 Text(
-                    "Valido 24 ore, monouso. Condividilo con chi vuoi aggiungere.",
+                    stringResource(R.string.valido_24_ore_monouso_condividilo_c),
                     style     = MaterialTheme.typography.bodyMedium,
                     color     = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -554,7 +549,7 @@ private fun InviteCodeBottomSheet(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Da usare su: $serverUrl",
+                            stringResource(R.string.da_usare_su, serverUrl),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -571,7 +566,7 @@ private fun InviteCodeBottomSheet(
                     OutlinedButton(
                         onClick  = {
                             val cb = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            cb.setPrimaryClip(ClipData.newPlainText("Codice Invito", inviteCode))
+                            cb.setPrimaryClip(ClipData.newPlainText(context.getString(R.string.codice_invito), inviteCode))
                             Toast.makeText(context, "Codice copiato!", Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.weight(1f),
@@ -579,7 +574,7 @@ private fun InviteCodeBottomSheet(
                     ) {
                         Icon(Icons.Default.ContentCopy, null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Copia", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.copia), fontWeight = FontWeight.SemiBold)
                     }
                     Button(
                         onClick  = {
@@ -595,7 +590,7 @@ private fun InviteCodeBottomSheet(
                     ) {
                         Icon(Icons.Default.Share, null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Condividi", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.condividi), fontWeight = FontWeight.SemiBold)
                     }
                 }
 
@@ -604,7 +599,7 @@ private fun InviteCodeBottomSheet(
                     onClick  = onDismiss,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Chiudi", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.chiudi), fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(4.dp))
             }
@@ -679,7 +674,7 @@ private fun MemberCard(
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
-                                "tu",
+                                stringResource(R.string.tu),
                                 style    = MaterialTheme.typography.labelSmall,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 color    = MaterialTheme.colorScheme.onTertiaryContainer
@@ -705,7 +700,7 @@ private fun MemberCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            if (memberIsOwner) "Proprietario" else "Membro",
+                            if (memberIsOwner) stringResource(R.string.proprietario) else stringResource(R.string.membro_ruolo),
                             style = MaterialTheme.typography.labelSmall,
                             color = accentColor
                         )
@@ -718,7 +713,7 @@ private fun MemberCard(
                 BouncyIconButton(onClick = onChangeRole) {
                     Icon(
                         if (memberIsOwner) Icons.Default.ArrowDownward else Icons.Default.Shield,
-                        contentDescription = if (memberIsOwner) "Retrocedi a membro" else "Promuovi a proprietario",
+                        contentDescription = if (memberIsOwner) stringResource(R.string.retrocedi_membro) else stringResource(R.string.promuovi_proprietario),
                         tint = if (memberIsOwner) MaterialTheme.colorScheme.secondary
                         else MaterialTheme.colorScheme.primary
                     )
@@ -731,7 +726,7 @@ private fun MemberCard(
                     BouncyIconButton(onClick = onRemove) {
                         Icon(
                             Icons.Default.PersonRemove,
-                            contentDescription = "Rimuovi ${member.username}",
+                            contentDescription = stringResource(R.string.rimuovi_utente, member.username),
                             tint = MaterialTheme.colorScheme.error
                         )
                     }

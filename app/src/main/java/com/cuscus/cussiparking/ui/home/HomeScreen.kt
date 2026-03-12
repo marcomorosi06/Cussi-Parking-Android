@@ -27,6 +27,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import com.cuscus.cussiparking.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -188,7 +190,7 @@ fun HomeScreen(
 
     BackHandler(enabled = vehicleForMap != null) { vehicleForMap = null }
 
-    Crossfade(targetState = vehicleForMap, label = "map_vs_list") { mapVehicle ->
+    Crossfade(targetState = vehicleForMap, label = "mapvslist") { mapVehicle ->
         if (mapVehicle != null) {
             MapSelectionOverlay(
                 vehicle         = mapVehicle,
@@ -206,7 +208,7 @@ fun HomeScreen(
                     TopAppBar(
                         title = {
                             Column {
-                                Text("I Miei Veicoli", fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.i_miei_veicoli), fontWeight = FontWeight.Bold)
                                 AnimatedVisibility(
                                     visible = isLoading,
                                     enter   = fadeIn() + expandVertically(),
@@ -220,7 +222,7 @@ fun HomeScreen(
                                 }
                                 if (!isLoading && vehicles.isNotEmpty()) {
                                     Text(
-                                        "${vehicles.size} ${if (vehicles.size == 1) "veicolo" else "veicoli"}",
+                                        if (vehicles.size == 1) stringResource(R.string.veicolo_singolo, vehicles.size) else stringResource(R.string.veicoli_multiplo, vehicles.size),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                                     )
@@ -230,14 +232,14 @@ fun HomeScreen(
                         actions = {
                             if (loggedProfiles.isNotEmpty()) {
                                 BouncyIconButton(onClick = { showJoinByCodeDialog = true }) {
-                                    Icon(Icons.Default.VpnKey, contentDescription = "Unisciti con codice")
+                                    Icon(Icons.Default.VpnKey, contentDescription = stringResource(R.string.unisciti_con_codice))
                                 }
                             }
                             BouncyIconButton(onClick = onNavigateToSettings) {
-                                Icon(Icons.Default.Settings, contentDescription = "Impostazioni")
+                                Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.impostazioni))
                             }
                             BouncyIconButton(onClick = { viewModel.fetchLocations() }) {
-                                Icon(Icons.Default.Refresh, contentDescription = "Aggiorna")
+                                Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.aggiorna))
                             }
                         }
                     )
@@ -246,12 +248,12 @@ fun HomeScreen(
                     val fabScale by animateFloatAsState(
                         targetValue   = if (isLoading) 0.9f else 1f,
                         animationSpec = bouncySpring,
-                        label         = "fab_scale"
+                        label         = "fabscale"
                     )
                     ExtendedFloatingActionButton(
                         onClick        = { showAddDialog = true },
                         icon           = { Icon(Icons.Default.Add, contentDescription = null) },
-                        text           = { Text("Aggiungi", fontWeight = FontWeight.SemiBold) },
+                        text           = { Text(stringResource(R.string.aggiungi), fontWeight = FontWeight.SemiBold) },
                         modifier       = Modifier.scale(fabScale),
                         shape          = RoundedCornerShape(20.dp),
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -268,7 +270,7 @@ fun HomeScreen(
                     if (isOffline) {
                         StatusBanner(
                             icon    = Icons.Default.WifiOff,
-                            message = "Modalita offline — nessuna sincronizzazione attiva.",
+                            message = stringResource(R.string.modalita_offline_desc),
                             bgColor = MaterialTheme.colorScheme.secondaryContainer,
                             fgColor = MaterialTheme.colorScheme.onSecondaryContainer
                         )
@@ -277,9 +279,9 @@ fun HomeScreen(
                         StatusBanner(
                             icon    = Icons.Default.CloudOff,
                             message = if (unreachableProfiles.size == 1)
-                                "Server \"${unreachableProfiles.first()}\" non raggiungibile. Parcheggi salvati in locale."
+                                stringResource(R.string.server_non_raggiungibile_singolo, unreachableProfiles.first())
                             else
-                                "Server non raggiungibili: ${unreachableProfiles.joinToString(", ")}",
+                                stringResource(R.string.server_non_raggiungibili_multiplo, unreachableProfiles.joinToString(", ")),
                             bgColor = MaterialTheme.colorScheme.errorContainer,
                             fgColor = MaterialTheme.colorScheme.onErrorContainer
                         )
@@ -398,7 +400,7 @@ private fun ExpressiveLoadingState() {
         ContainedLoadingIndicator()
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            "Caricamento veicoli…",
+            stringResource(R.string.caricamento_veicoli),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -413,7 +415,7 @@ private fun ExpressiveEmptyState(
     loggedProfiles: List<ServerProfile>,
     onAddVehicle: () -> Unit
 ) {
-    val pulse = rememberInfiniteTransition(label = "empty_pulse")
+    val pulse = rememberInfiniteTransition(label = "emptypulse")
     val pulseScale by pulse.animateFloat(
         initialValue  = 0.93f,
         targetValue   = 1.07f,
@@ -421,7 +423,7 @@ private fun ExpressiveEmptyState(
             tween(1800, easing = FastOutSlowInEasing),
             RepeatMode.Reverse
         ),
-        label = "pulse_scale"
+        label = "pulsescale"
     )
     Column(
         modifier = Modifier
@@ -446,7 +448,7 @@ private fun ExpressiveEmptyState(
         }
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            "Nessun veicolo",
+            stringResource(R.string.nessun_veicolo),
             style      = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
@@ -463,7 +465,7 @@ private fun ExpressiveEmptyState(
         Button(onClick = onAddVehicle, shape = RoundedCornerShape(16.dp)) {
             Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Aggiungi veicolo", fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.aggiungi_veicolo), fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -528,22 +530,22 @@ fun VehicleCard(
         isLocalOnly -> SyncInfo(
             iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
             icon = Icons.Default.PhoneAndroid,
-            label = "Solo locale"
+            label = stringResource(R.string.solo_locale)
         )
         vehicle.syncState == 1 -> SyncInfo(
             iconTint = Color(0xFF2E7D32),
             icon = Icons.Default.CloudDone,
-            label = "Sincronizzato"
+            label = stringResource(R.string.sincronizzato)
         )
         vehicle.syncState == 2 -> SyncInfo(
             iconTint = Color(0xFFF57F17),
             icon = Icons.Default.CloudUpload,
-            label = "In attesa"
+            label = stringResource(R.string.in_attesa)
         )
         else -> SyncInfo(
             iconTint = MaterialTheme.colorScheme.error,
             icon = Icons.Default.CloudOff,
-            label = "Non sincronizzato"
+            label = stringResource(R.string.non_sincronizzato)
         )
     }
 
@@ -620,7 +622,7 @@ fun VehicleCard(
                 // Azioni rapide spostate in alto a destra per pulizia
                 Row(horizontalArrangement = Arrangement.End) {
                     IconButton(onClick = onManageTriggers) {
-                        Icon(Icons.Default.AutoMode, contentDescription = "Trigger", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(Icons.Default.AutoMode, contentDescription = stringResource(R.string.trigger), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     // Menu a tendina o altre azioni potrebbero andare qui
                 }
@@ -647,12 +649,15 @@ fun VehicleCard(
                             Spacer(modifier = Modifier.width(8.dp))
 
                             val histLabel = buildString {
-                                if (!vehicle.lastUpdatedBy.isNullOrBlank()) append("Aggiornato da @${vehicle.lastUpdatedBy}")
-                                else append("Posizione registrata")
+                                if (!vehicle.lastUpdatedBy.isNullOrBlank()) {
+                                    append(stringResource(R.string.aggiornato_da, vehicle.lastUpdatedBy))
+                                } else {
+                                    append(stringResource(R.string.posizione_registrata))
+                                }
 
                                 vehicle.updatedAt?.let {
                                     val fmt = SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault())
-                                    append(" il ${fmt.format(Date(it * 1000))}")
+                                    append(stringResource(R.string.aggiornato_il, fmt.format(Date(it * 1000))))
                                 }
                             }
                             Text(
@@ -676,7 +681,7 @@ fun VehicleCard(
                         ) {
                             Icon(Icons.Default.Navigation, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Raggiungi il veicolo", fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.raggiungi_il_veicolo), fontWeight = FontWeight.SemiBold)
                         }
                     }
                 } else {
@@ -689,7 +694,7 @@ fun VehicleCard(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Nessuna posizione registrata.",
+                            stringResource(R.string.nessuna_posizione_registrata),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -723,7 +728,7 @@ fun VehicleCard(
                     ) {
                         Icon(Icons.Default.GpsFixed, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Usa GPS")
+                        Text(stringResource(R.string.usa_gps))
                     }
 
                     OutlinedButton(
@@ -733,7 +738,7 @@ fun VehicleCard(
                     ) {
                         Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Mappa")
+                        Text(stringResource(R.string.mappa))
                     }
                 }
 
@@ -741,12 +746,12 @@ fun VehicleCard(
                 Row {
                     if (!isLocalOnly) {
                         IconButton(onClick = onManageMembers) {
-                            Icon(Icons.Default.Group, contentDescription = "Membri", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Icon(Icons.Default.Group, contentDescription = stringResource(R.string.membri), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     if (isOwner || isLocalOnly) {
                         IconButton(onClick = onDelete) {
-                            Icon(Icons.Default.DeleteOutline, contentDescription = "Elimina", tint = MaterialTheme.colorScheme.error)
+                            Icon(Icons.Default.DeleteOutline, contentDescription = stringResource(R.string.elimina), tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
@@ -891,12 +896,12 @@ fun AddVehicleBottomSheet(
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "Aggiungi Veicolo",
+                stringResource(R.string.aggiungi_veicolo),
                 style      = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Black
             )
             Text(
-                "Scegli un nome e dove salvare il veicolo.",
+                stringResource(R.string.scegli_un_nome_e_dove_salvare_il_ve),
                 style  = MaterialTheme.typography.bodyMedium,
                 color  = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp)
@@ -906,7 +911,7 @@ fun AddVehicleBottomSheet(
             OutlinedTextField(
                 value         = newVehicleName,
                 onValueChange = { newVehicleName = it },
-                label         = { Text("Nome veicolo") },
+                label         = { Text(stringResource(R.string.nome_veicolo)) },
                 leadingIcon   = { Icon(Icons.Default.DriveFileRenameOutline, contentDescription = null) },
                 singleLine    = true,
                 modifier      = Modifier.fillMaxWidth(),
@@ -916,7 +921,7 @@ fun AddVehicleBottomSheet(
             if (isOnlineAvailable) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    "Dove salvare?",
+                    stringResource(R.string.dove_salvare),
                     style      = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color      = MaterialTheme.colorScheme.onSurface
@@ -926,8 +931,8 @@ fun AddVehicleBottomSheet(
                 DestinationRow(
                     selected = destinationChosen && selectedProfileId == null,
                     onClick  = { selectedProfileId = null; destinationChosen = true },
-                    title    = "Solo su questo dispositivo",
-                    subtitle = "Non visibile agli altri"
+                    title    = stringResource(R.string.solo_su_questo_dispositivo),
+                    subtitle = stringResource(R.string.non_visibile_agli_altri)
                 )
                 loggedProfiles.forEach { profile ->
                     DestinationRow(
@@ -955,8 +960,8 @@ fun AddVehicleBottomSheet(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            if (isOffline) "Modalità offline: salvato in locale."
-                            else "Nessun server: salvato in locale.",
+                            if (isOffline) stringResource(R.string.modalita_offline_locale)
+                            else stringResource(R.string.nessun_server_locale),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -970,7 +975,7 @@ fun AddVehicleBottomSheet(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text("Annulla", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.annulla), fontWeight = FontWeight.Bold)
                 }
                 Button(
                     onClick = {
@@ -980,7 +985,7 @@ fun AddVehicleBottomSheet(
                     enabled = canConfirm,
                     shape   = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Salva Veicolo", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.salva_veicolo), fontWeight = FontWeight.Bold)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -1001,7 +1006,7 @@ private fun DestinationRow(
     val rowScale by animateFloatAsState(
         targetValue   = if (selected) 1.02f else 1f,
         animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium),
-        label         = "dest_scale"
+        label         = "destscale"
     )
     Surface(
         onClick  = onClick,
@@ -1084,12 +1089,12 @@ fun JoinByCodeBottomSheet(
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                "Unisciti con Codice",
+                stringResource(R.string.unisciti_con_codice),
                 style      = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Black
             )
             Text(
-                "Inserisci il codice condiviso dal proprietario del veicolo.",
+                stringResource(R.string.inserisci_il_codice_condiviso_dal_p),
                 style  = MaterialTheme.typography.bodyMedium,
                 color  = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp)
@@ -1099,7 +1104,7 @@ fun JoinByCodeBottomSheet(
             OutlinedTextField(
                 value         = codeInput,
                 onValueChange = { codeInput = it.uppercase().trim() },
-                label         = { Text("Codice invito") },
+                label         = { Text(stringResource(R.string.codice_invito)) },
                 leadingIcon   = { Icon(Icons.Default.VpnKey, contentDescription = null) },
                 singleLine    = true,
                 modifier      = Modifier.fillMaxWidth(),
@@ -1109,7 +1114,7 @@ fun JoinByCodeBottomSheet(
             if (loggedProfiles.size > 1) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    "Su quale server?",
+                    stringResource(R.string.su_quale_server),
                     style      = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -1130,7 +1135,7 @@ fun JoinByCodeBottomSheet(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text("Annulla", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.annulla), fontWeight = FontWeight.Bold)
                 }
                 Button(
                     onClick  = { selectedProfile?.let { onJoin(codeInput, it.id) } },
@@ -1139,7 +1144,7 @@ fun JoinByCodeBottomSheet(
                 ) {
                     AnimatedContent(
                         targetState = isLoading,
-                        label       = "join_btn",
+                        label       = "joinbtn",
                         transitionSpec = {
                             fadeIn(tween(160)) togetherWith fadeOut(tween(160))
                         }
@@ -1149,7 +1154,7 @@ fun JoinByCodeBottomSheet(
                             color       = MaterialTheme.colorScheme.onPrimary,
                             strokeWidth = 2.dp
                         )
-                        else Text("Unisciti", fontWeight = FontWeight.Bold)
+                        else Text(stringResource(R.string.unisciti), fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -1203,13 +1208,13 @@ fun MapSelectionOverlay(
     val pinOffsetY by animateFloatAsState(
         targetValue = if (isMapMoving) -44f else -24f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-        label = "pin_bounce_y"
+        label = "pinbouncey"
     )
 
     val shadowScale by animateFloatAsState(
         targetValue = if (isMapMoving) 0.6f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "shadow_scale"
+        label = "shadowscale"
     )
 
     // ── GESTIONE DINAMICA TILES ──
@@ -1271,10 +1276,9 @@ fun MapSelectionOverlay(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Dov'è ${vehicle.name}?", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
+                title = { Text(stringResource(R.string.dove_veicolo, vehicle.name), fontWeight = FontWeight.Bold) },                navigationIcon = {
                     IconButton(onClick = onCancel) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Annulla")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.annulla))
                     }
                 },
                 actions = {
@@ -1287,7 +1291,7 @@ fun MapSelectionOverlay(
                                     MapThemeMode.DARK -> Icons.Default.DarkMode
                                     MapThemeMode.SYSTEM -> Icons.Default.BrightnessAuto
                                 },
-                                contentDescription = "Tema Mappa"
+                                contentDescription = stringResource(R.string.tema_mappa)
                             )
                         }
                         DropdownMenu(
@@ -1296,7 +1300,7 @@ fun MapSelectionOverlay(
                         ) {
                             MapThemeMode.entries.forEach { mode ->
                                 DropdownMenuItem(
-                                    text = { Text(mode.label) },
+                                    text = { Text(text = stringResource(id = mode.labelResId)) },
                                     onClick = { mapThemeMode = mode; showThemeMenu = false },
                                     trailingIcon = if (mapThemeMode == mode) { { Icon(Icons.Default.Check, null) } } else null
                                 )
@@ -1307,7 +1311,7 @@ fun MapSelectionOverlay(
                     // Menu Provider
                     Box {
                         IconButton(onClick = { showProviderMenu = true }) {
-                            Icon(Icons.Default.Layers, contentDescription = "Stile Mappa")
+                            Icon(Icons.Default.Layers, contentDescription = stringResource(R.string.stile_mappa))
                         }
                         DropdownMenu(
                             expanded = showProviderMenu,
@@ -1394,7 +1398,7 @@ fun MapSelectionOverlay(
                 // Icona Pin
                 Icon(
                     Icons.Default.LocationOn,
-                    contentDescription = "Puntatore",
+                    contentDescription = stringResource(R.string.puntatore),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -1442,7 +1446,7 @@ fun MapSelectionOverlay(
                             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Icon(Icons.Default.Search, contentDescription = "Coordinate manuali")
+                            Icon(Icons.Default.Search, contentDescription = stringResource(R.string.coordinate_manuali))
                         }
 
                         SmallFloatingActionButton(
@@ -1459,7 +1463,7 @@ fun MapSelectionOverlay(
                             contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Icon(Icons.Default.MyLocation, contentDescription = "Centra su di me")
+                            Icon(Icons.Default.MyLocation, contentDescription = stringResource(R.string.centra_su_di_me))
                         }
                     }
 
@@ -1474,7 +1478,7 @@ fun MapSelectionOverlay(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(24.dp))
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text("Conferma", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.conferma), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -1486,14 +1490,14 @@ fun MapSelectionOverlay(
                 var inputLng by remember { mutableStateOf("") }
                 AlertDialog(
                     onDismissRequest = { showManualInput = false },
-                    title = { Text("Vai alle Coordinate", fontWeight = FontWeight.Bold) },
+                    title = { Text(stringResource(R.string.vai_alle_coordinate), fontWeight = FontWeight.Bold) },
                     shape = RoundedCornerShape(24.dp),
                     text = {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             OutlinedTextField(
                                 value = inputLat,
                                 onValueChange = { inputLat = it },
-                                label = { Text("Latitudine") },
+                                label = { Text(stringResource(R.string.latitudine)) },
                                 leadingIcon = { Icon(Icons.Default.NorthEast, contentDescription = null) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 shape = RoundedCornerShape(16.dp),
@@ -1502,7 +1506,7 @@ fun MapSelectionOverlay(
                             OutlinedTextField(
                                 value = inputLng,
                                 onValueChange = { inputLng = it },
-                                label = { Text("Longitudine") },
+                                label = { Text(stringResource(R.string.longitudine)) },
                                 leadingIcon = { Icon(Icons.Default.SouthEast, contentDescription = null) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 shape = RoundedCornerShape(16.dp),
@@ -1521,10 +1525,10 @@ fun MapSelectionOverlay(
                                 }
                             },
                             shape = RoundedCornerShape(12.dp)
-                        ) { Text("Vai") }
+                        ) { Text(stringResource(R.string.vai)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { showManualInput = false }) { Text("Annulla") }
+                        TextButton(onClick = { showManualInput = false }) { Text(stringResource(R.string.annulla)) }
                     }
                 )
             }

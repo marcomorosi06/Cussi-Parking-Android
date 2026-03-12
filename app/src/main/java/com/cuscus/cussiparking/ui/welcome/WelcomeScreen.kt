@@ -28,6 +28,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import com.cuscus.cussiparking.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -48,7 +50,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import com.cuscus.cussiparking.R
 import com.cuscus.cussiparking.data.SettingsManager
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -63,7 +64,7 @@ fun WelcomeScreen(
     val scope   = rememberCoroutineScope()
 
     // Ora abbiamo 10 pagine totali (aggiunta configurazione Server)
-    val totalPages = 10
+    val totalPages = 9
     val pagerState = rememberPagerState(pageCount = { totalPages })
 
     // ── Permission helpers ─────────────────────────────────────────────────
@@ -109,28 +110,28 @@ fun WelcomeScreen(
                     3 -> SetupModePage(settingsManager = settingsManager, onNext = ::advance)
 
                     4 -> PermissionPage(
-                        icon = Icons.Default.MyLocation, iconTint = MaterialTheme.colorScheme.primary, badgeColor = MaterialTheme.colorScheme.errorContainer, badgeText = "Richiesto",
-                        title = "Posizione precisa", subtitle = "Per sapere dove hai parcheggiato", granted = hasFineLoc(),
-                        rationale = "L'app usa il GPS per salvare il punto esatto in cui hai parcheggiato. Senza questo permesso non è possibile registrare né visualizzare le posizioni dei veicoli.",
+                        icon = Icons.Default.MyLocation, iconTint = MaterialTheme.colorScheme.primary, badgeColor = MaterialTheme.colorScheme.errorContainer, badgeText = stringResource(R.string.richiesto),
+                        title = stringResource(R.string.posizione_precisa), subtitle = stringResource(R.string.posizione_precisa_sub), granted = hasFineLoc(),
+                        rationale = stringResource(R.string.posizione_precisa_rationale),
                         details = listOf(
-                            PermDetail(Icons.Default.GpsFixed, "GPS preciso per la posizione del veicolo"),
-                            PermDetail(Icons.Default.LocationOn, "Posizione in primo piano quando l'app è aperta")
+                            PermDetail(Icons.Default.GpsFixed, stringResource(R.string.gps_preciso_veicolo)),
+                            PermDetail(Icons.Default.LocationOn, stringResource(R.string.posizione_primo_piano))
                         ),
-                        buttonLabel = "Concedi posizione", onNext = ::advance,
+                        buttonLabel = stringResource(R.string.concedi_posizione), onNext = ::advance,
                         onGrant = { fineLocLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) }
                     )
 
                     5 -> PermissionPage(
-                        icon = Icons.Default.LocationOn, iconTint = MaterialTheme.colorScheme.tertiary, badgeColor = MaterialTheme.colorScheme.errorContainer, badgeText = "Critico per i trigger",
-                        title = "Posizione sempre", subtitle = "Trigger automatici in background", granted = hasBgLoc(),
-                        rationale = "Questo è il permesso più importante per i trigger automatici.\n\nQuando ti disconnetti dall'auto via Bluetooth, il sistema deve poter raccogliere la tua posizione GPS anche con l'app chiusa.\n\nSu Android 11+ devi andare nelle Impostazioni di sistema e scegliere \"Consenti sempre\".",
+                        icon = Icons.Default.LocationOn, iconTint = MaterialTheme.colorScheme.tertiary, badgeColor = MaterialTheme.colorScheme.errorContainer, badgeText = stringResource(R.string.critico_trigger),
+                        title = stringResource(R.string.posizione_sempre), subtitle = stringResource(R.string.posizione_sempre_sub), granted = hasBgLoc(),
+                        rationale = stringResource(R.string.posizione_sempre_rationale),
                         details = listOf(
-                            PermDetail(Icons.Default.Bluetooth, "Trigger BT: salva alla disconnessione"),
-                            PermDetail(Icons.Default.Nfc, "Trigger NFC: salva col tag"),
-                            PermDetail(Icons.Default.BatterySaver, "Zero impatto costante sulla batteria")
+                            PermDetail(Icons.Default.Bluetooth, stringResource(R.string.trigger_bt_desc)),
+                            PermDetail(Icons.Default.Nfc, stringResource(R.string.trigger_nfc_desc)),
+                            PermDetail(Icons.Default.BatterySaver, stringResource(R.string.zero_impatto_batteria))
                         ),
-                        buttonLabel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) "Apri impostazioni" else "Concedi posizione sempre",
-                        extraNote = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) "Vai in Autorizzazioni → Posizione → Consenti sempre" else null,
+                        buttonLabel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) stringResource(R.string.apri_impostazioni) else stringResource(R.string.concedi_posizione_sempre),
+                        extraNote = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) stringResource(R.string.vai_in_autorizzazioni) else null,
                         onNext = ::advance,
                         onGrant = {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -179,7 +180,7 @@ fun WelcomeScreen(
                         onClick = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
                         shape = CircleShape,
                         colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
-                    ) { Icon(Icons.Default.ArrowBack, contentDescription = "Indietro", tint = MaterialTheme.colorScheme.onSurface) }
+                    ) { Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.indietro), tint = MaterialTheme.colorScheme.onSurface) }
                 }
                 if (pagerState.currentPage == 0) Spacer(Modifier.width(48.dp))
 
@@ -188,7 +189,7 @@ fun WelcomeScreen(
                 // Mostra "Salta" solo sulle info e nascondilo sulla Configurazione Server (3) e Permissions
                 AnimatedVisibility(visible = pagerState.currentPage in 1..2 || pagerState.currentPage == 4) {
                     TextButton(onClick = { scope.launch { pagerState.animateScrollToPage(5) } }, shape = RoundedCornerShape(100.dp)) {
-                        Text("Salta", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.salta), color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
                     }
                 }
                 if (pagerState.currentPage !in 1..2 && pagerState.currentPage != 4) Spacer(Modifier.width(64.dp))
@@ -206,7 +207,7 @@ private fun HeroPage(onNext: () -> Unit) {
     LaunchedEffect(Unit) { visible = true }
 
     // ── Animazione di Levitazione (Floating) ──
-    val infiniteTransition = rememberInfiniteTransition(label = "hero_anim")
+    val infiniteTransition = rememberInfiniteTransition(label = "heroanim")
     val floatOffsetY by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = -16f, // Fluttua verso l'alto di 16dp
@@ -214,7 +215,7 @@ private fun HeroPage(onNext: () -> Unit) {
             animation = tween(2500, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "float_y"
+        label = "floaty"
     )
 
     // Un leggero bagliore che respira dietro il logo
@@ -225,7 +226,7 @@ private fun HeroPage(onNext: () -> Unit) {
             animation = tween(2500, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "glow_scale"
+        label = "glowscale"
     )
 
     Column(
@@ -261,7 +262,7 @@ private fun HeroPage(onNext: () -> Unit) {
                 // Il tuo logo che fluttua
                 Image(
                     painter = painterResource(id = R.drawable.app_logo),
-                    contentDescription = "Logo CussiParking",
+                    contentDescription = stringResource(R.string.logo_cussiparking),
                     modifier = Modifier
                         .size(140.dp)
                         .offset(y = floatOffsetY.dp), // Applica la levitazione
@@ -279,7 +280,7 @@ private fun HeroPage(onNext: () -> Unit) {
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "CussiParking",
+                    text = stringResource(R.string.cussiparking),
                     style = MaterialTheme.typography.displayMedium, // Massiccio ma senza esagerare
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurface, // Colore solido e pulito
@@ -287,7 +288,7 @@ private fun HeroPage(onNext: () -> Unit) {
                 )
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    text = "Il tuo parcheggio intelligente.\nNon perdere mai più l'auto.",
+                    text = stringResource(R.string.il_tuo_parcheggio_intelligentennon_),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -309,7 +310,7 @@ private fun HeroPage(onNext: () -> Unit) {
                 modifier = Modifier.fillMaxWidth().height(64.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Iniziamo", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.iniziamo), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.width(12.dp))
                 Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(24.dp))
             }
@@ -326,27 +327,27 @@ private fun HeroPage(onNext: () -> Unit) {
 @Composable
 private fun HowItWorksPage(onNext: () -> Unit) {
     InfoPage(
-        eyebrow = "Come funziona",
-        title = "Il tuo parcheggio,\nle tue regole",
-        subtitle = "Flessibilità totale per salvare e ritrovare l'auto.",
+        eyebrow = stringResource(R.string.come_funziona),
+        title = stringResource(R.string.il_tuo_parcheggio_regole),
+        subtitle = stringResource(R.string.flessibilita_totale),
         steps = listOf(
             InfoStep(
                 icon = Icons.Default.SaveAs,
                 color = MaterialTheme.colorScheme.primary,
-                heading = "Salva la posizione",
-                body = "Usa il GPS sul momento, seleziona il punto sulla mappa se ti sei scordato di salvarla da fuori, oppure usa un tag NFC o il Bluetooth."
+                heading = stringResource(R.string.salva_la_posizione),
+                body = stringResource(R.string.salva_la_posizione_desc)
             ),
             InfoStep(
                 icon = Icons.Default.Navigation,
                 color = MaterialTheme.colorScheme.secondary,
-                heading = "Ritrova il veicolo",
-                body = "Un pulsante dedicato apre la tua app di navigazione predefinita (Maps, Waze) per farti guidare dritto alle coordinate salvate."
+                heading = stringResource(R.string.ritrova_il_veicolo),
+                body = stringResource(R.string.ritrova_il_veicolo_desc)
             ),
             InfoStep(
                 icon = Icons.Default.AutoMode,
                 color = MaterialTheme.colorScheme.tertiary,
-                heading = "Tutto in automatico",
-                body = "Rileva la disconnessione del Bluetooth dell'auto o tocca un tag NFC per registrare il parcheggio senza nemmeno aprire l'app."
+                heading = stringResource(R.string.tutto_in_automatico),
+                body = stringResource(R.string.tutto_in_automatico_desc)
             )
         ),
         onNext = onNext
@@ -360,6 +361,7 @@ private fun HowItWorksPage(onNext: () -> Unit) {
 private fun PrivateServerPage(onNext: () -> Unit) {
     val uriHandler = LocalUriHandler.current
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -370,32 +372,32 @@ private fun PrivateServerPage(onNext: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(shape = RoundedCornerShape(100.dp), color = MaterialTheme.colorScheme.secondaryContainer) {
-            Text("SELF-HOSTED", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+            Text(stringResource(R.string.selfhosted), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
         }
         Spacer(Modifier.height(24.dp))
-        Text("Privato,\nsicuro, tuo.", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.privatonsicuro_tuo), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
         Spacer(Modifier.height(12.dp))
-        Text("Nessun cloud di terze parti. I tuoi dati restano sotto il tuo totale controllo.", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.nessun_cloud_di_terze_parti_i_tuoi_), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         Spacer(Modifier.height(40.dp))
 
         val steps = listOf(
             InfoStep(
                 icon = Icons.Default.Dns,
                 color = MaterialTheme.colorScheme.primary,
-                heading = "Hostalo dove vuoi",
-                body = "Il server è leggerissimo: puoi farlo girare su qualsiasi computer Linux, persino su un Raspberry Pi Zero W."
+                heading = stringResource(R.string.hostalo_dove_vuoi),
+                body = stringResource(R.string.hostalo_dove_vuoi_desc)
             ),
             InfoStep(
                 icon = Icons.Default.Group,
                 color = MaterialTheme.colorScheme.secondary,
-                heading = "Per la tua famiglia",
-                body = "Condividi i veicoli con chi vuoi. Creazione account e login si fanno direttamente dall'app, senza pannelli web."
+                heading = stringResource(R.string.per_la_tua_famiglia),
+                body = stringResource(R.string.per_la_tua_famiglia_desc)
             ),
             InfoStep(
                 icon = Icons.Default.Code,
                 color = MaterialTheme.colorScheme.tertiary,
-                heading = "100% Open Source",
-                body = "Codice trasparente. Scarica il server da GitHub e configuralo in pochi minuti."
+                heading = stringResource(R.string.open_source_100),
+                body = stringResource(R.string.open_source_100_desc)
             )
         )
 
@@ -417,13 +419,13 @@ private fun PrivateServerPage(onNext: () -> Unit) {
         ) {
             Icon(Icons.Default.Code, contentDescription = null, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(12.dp))
-            Text("Scarica il Server", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.scarica_il_server), fontWeight = FontWeight.Bold)
         }
 
         Spacer(Modifier.height(24.dp))
 
         Button(onClick = onNext, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().height(64.dp)) {
-            Text("Prossimo", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.prossimo), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(12.dp))
             Icon(Icons.Default.ArrowForward, null, modifier = Modifier.size(20.dp))
         }
@@ -434,23 +436,24 @@ private fun MultiProfilePage(onNext: () -> Unit) {
     val uriHandler = LocalUriHandler.current
 
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 32.dp).padding(top = 64.dp, bottom = 140.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(shape = RoundedCornerShape(100.dp), color = MaterialTheme.colorScheme.secondaryContainer) {
-            Text("IL TUO SERVER", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+            Text(stringResource(R.string.il_tuo_server), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
         }
         Spacer(Modifier.height(24.dp))
-        Text("Privato,\nsicuro, tuo.", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.privatonsicuro_tuo), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
         Spacer(Modifier.height(12.dp))
-        Text("Nessun cloud di terze parti. I tuoi dati restano sotto il tuo totale controllo.", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.nessun_cloud_di_terze_parti_i_tuoi_), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         Spacer(Modifier.height(40.dp))
 
         val steps = listOf(
-            InfoStep(Icons.Default.Dns, MaterialTheme.colorScheme.primary, "Hostalo dove ti pare", "Il server è privato e leggerissimo: puoi farlo girare persino su un Raspberry Pi Zero W."),
-            InfoStep(Icons.Default.Login, MaterialTheme.colorScheme.secondary, "Tutto dall'app", "Non serve alcun pannello web. La registrazione degli account e il login si fanno direttamente da qui."),
-            InfoStep(Icons.Default.Code, MaterialTheme.colorScheme.tertiary, "100% Open Source", "Codice trasparente. Scarica il server da GitHub, configuralo e condividi le auto con la famiglia.")
+            InfoStep(Icons.Default.Dns, MaterialTheme.colorScheme.primary, stringResource(R.string.hostalo_dove_ti_pare), stringResource(R.string.hostalo_dove_ti_pare_desc)),
+            InfoStep(Icons.Default.Login, MaterialTheme.colorScheme.secondary, stringResource(R.string.tutto_dall_app), stringResource(R.string.tutto_dall_app_desc)),
+            InfoStep(Icons.Default.Code, MaterialTheme.colorScheme.tertiary, stringResource(R.string.open_source_100), stringResource(R.string.open_source_famiglia_desc))
         )
 
         steps.forEachIndexed { index, step ->
@@ -471,13 +474,13 @@ private fun MultiProfilePage(onNext: () -> Unit) {
         ) {
             Icon(Icons.Default.Code, contentDescription = null, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(12.dp))
-            Text("Vedi il Server su GitHub", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.vedi_il_server_su_github), fontWeight = FontWeight.Bold)
         }
 
         Spacer(Modifier.height(24.dp))
 
         Button(onClick = onNext, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().height(64.dp)) {
-            Text("Prossimo", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.prossimo), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(12.dp))
             Icon(Icons.Default.ArrowForward, null, modifier = Modifier.size(20.dp))
         }
@@ -490,6 +493,7 @@ private fun MultiProfilePage(onNext: () -> Unit) {
 @Composable
 private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     var isCloudSelected by remember { mutableStateOf<Boolean?>(null) } // null = nessuna scelta
 
     var serverLabel by remember { mutableStateOf("") }
@@ -501,20 +505,20 @@ private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) 
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(shape = RoundedCornerShape(100.dp), color = MaterialTheme.colorScheme.secondaryContainer) {
-            Text("INIZIAMO", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+            Text(stringResource(R.string.iniziamo), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
         }
         Spacer(Modifier.height(24.dp))
-        Text("Scegli la\nModalità", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.scegli_lanmodalit), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
         Spacer(Modifier.height(12.dp))
-        Text("Vuoi connetterti subito al tuo server o usare l'app offline?", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.vuoi_connetterti_subito_al_tuo_serv), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
 
         Spacer(Modifier.height(40.dp))
 
         // Card Offline (Configura in seguito)
         ModeSelectionCard(
             icon = Icons.Default.PhoneAndroid,
-            title = "Configura in seguito",
-            subtitle = "Usa la modalità Offline. Potrai aggiungere un server dalle Impostazioni in qualsiasi momento.",
+            title = stringResource(R.string.configura_in_seguito),
+            subtitle = stringResource(R.string.configura_in_seguito_desc),
             selected = isCloudSelected == false,
             onClick = { isCloudSelected = false }
         )
@@ -524,8 +528,8 @@ private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) 
         // Card Cloud (Collega Server)
         ModeSelectionCard(
             icon = Icons.Default.Storage,
-            title = "Collega Server",
-            subtitle = "Sincronizza e condividi. Inserisci l'URL ora, farai login o registrazione appena finito il tutorial.",
+            title = stringResource(R.string.collega_server),
+            subtitle = stringResource(R.string.collega_server_desc),
             selected = isCloudSelected == true,
             onClick = { isCloudSelected = true }
         )
@@ -535,16 +539,16 @@ private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) 
             Column(modifier = Modifier.padding(top = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 OutlinedTextField(
                     value = serverLabel, onValueChange = { serverLabel = it },
-                    label = { Text("Nome Server (es. Casa, Lavoro)") },
+                    label = { Text(stringResource(R.string.nome_server_es_casa_lavoro)) },
                     shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = serverUrl, onValueChange = { serverUrl = it; showError = false },
-                    label = { Text("Indirizzo URL del Server") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                    label = { Text(stringResource(R.string.indirizzo_url_del_server)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
                     shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(), isError = showError
                 )
                 if (showError) {
-                    Text("Inserisci un URL valido per continuare.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(start = 8.dp))
+                    Text(stringResource(R.string.inserisci_un_url_valido_per_continu), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(start = 8.dp))
                 }
             }
         }
@@ -563,7 +567,7 @@ private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) 
                             settingsManager.setOfflineMode(false)
                             // Aggiunge il profilo in attesa di login. Mette una mail vuota temporanea.
                             if (settingsManager.profiles.value.none { it.serverUrl == serverUrl }) {
-                                settingsManager.addProfile(label = serverLabel.ifBlank { "Cloud" }, serverUrl = serverUrl.trim(), email = "Da configurare")
+                                settingsManager.addProfile(label = serverLabel.ifBlank { context.getString(R.string.cloud) }, serverUrl = serverUrl.trim(), email = context.getString(R.string.da_configurare))
                             }
                             onNext()
                         } else {
@@ -574,7 +578,7 @@ private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) 
                 shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().height(64.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(if (isCloudSelected == true) "Salva Server" else "Prosegui Offline", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(if (isCloudSelected == true) stringResource(R.string.salva_server) else stringResource(R.string.prosegui_offline), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.width(12.dp))
                 Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(20.dp))
             }
@@ -609,10 +613,10 @@ private fun ModeSelectionCard(icon: ImageVector, title: String, subtitle: String
 @Composable
 private fun TriggersOverviewPage(onNext: () -> Unit) {
     InfoPage(
-        eyebrow = "Automazione", title = "L'app lavora\nper te", subtitle = "Scendi dall'auto, la posizione si salva da sola.",
+        eyebrow = stringResource(R.string.automazione), title = stringResource(R.string.app_lavora_per_te), subtitle = stringResource(R.string.scendi_auto_salva_sola),
         steps = listOf(
-            InfoStep(Icons.Default.Bluetooth, MaterialTheme.colorScheme.secondary, "Bluetooth Audio", "Spegni l'autoradio e l'app capisce che sei arrivato."),
-            InfoStep(Icons.Default.Nfc, MaterialTheme.colorScheme.tertiary, "Tag NFC Fisico", "Un tap col telefono sul cruscotto e il gioco è fatto.")
+            InfoStep(Icons.Default.Bluetooth, MaterialTheme.colorScheme.secondary, stringResource(R.string.bluetooth_audio), stringResource(R.string.bluetooth_audio_desc)),
+            InfoStep(Icons.Default.Nfc, MaterialTheme.colorScheme.tertiary, stringResource(R.string.tag_nfc_fisico), stringResource(R.string.tag_nfc_fisico_desc))
         ),
         onNext = onNext
     )
@@ -631,6 +635,7 @@ private fun PermissionPage(
     onGrant: () -> Unit, onNext: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 32.dp).padding(top = 64.dp, bottom = 140.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.size(130.dp)) {
             Surface(shape = RoundedCornerShape(36.dp), color = iconTint.copy(alpha = 0.12f), modifier = Modifier.size(120.dp)) {
@@ -681,7 +686,7 @@ private fun PermissionPage(
         }
         Spacer(Modifier.height(12.dp))
         Button(onClick = onNext, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().height(64.dp), colors = ButtonDefaults.buttonColors(containerColor = if (granted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHighest, contentColor = if (granted) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant)) {
-            Text(if (granted) "Continua" else "Più tardi", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(if (granted) stringResource(R.string.continua) else stringResource(R.string.piu_tardi), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             if (granted) { Spacer(Modifier.width(8.dp)); Icon(Icons.Default.ArrowForward, null, modifier = Modifier.size(20.dp)) }
         }
     }
@@ -690,24 +695,25 @@ private fun PermissionPage(
 @Composable
 private fun CombinedPermissionPage(onGrantBt: () -> Unit, onGrantNotif: () -> Unit, hasBt: Boolean, hasNotif: Boolean, onNext: () -> Unit) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 32.dp).padding(top = 64.dp, bottom = 140.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Row(horizontalArrangement = Arrangement.spacedBy((-16).dp)) {
             DoubleIcon(Icons.Default.Bluetooth, MaterialTheme.colorScheme.secondary)
             DoubleIcon(Icons.Default.Notifications, MaterialTheme.colorScheme.primary)
         }
         Spacer(Modifier.height(32.dp))
-        Text("Dettagli Finali", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.dettagli_finali), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
         Spacer(Modifier.height(8.dp))
-        Text("Rendi i trigger impeccabili", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.rendi_i_trigger_impeccabili), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         Spacer(Modifier.height(40.dp))
 
-        PermCard(icon = Icons.Default.Bluetooth, iconTint = MaterialTheme.colorScheme.secondary, title = "Bluetooth (Android 12+)", description = "Necessario per leggere l'autoradio e configurare i trigger BT.", granted = hasBt, buttonLabel = "Sblocca", onGrant = onGrantBt)
+        PermCard(icon = Icons.Default.Bluetooth, iconTint = MaterialTheme.colorScheme.secondary, title = stringResource(R.string.bluetooth_android12), description = stringResource(R.string.bluetooth_rationale), granted = hasBt, buttonLabel = stringResource(R.string.sblocca), onGrant = onGrantBt)
         Spacer(Modifier.height(16.dp))
-        PermCard(icon = Icons.Default.Notifications, iconTint = MaterialTheme.colorScheme.primary, title = "Notifiche", description = "Serve a mostrare la notifica di sistema obbligatoria quando l'app rileva un parcheggio.", granted = hasNotif, buttonLabel = "Sblocca", onGrant = onGrantNotif)
+        PermCard(icon = Icons.Default.Notifications, iconTint = MaterialTheme.colorScheme.primary, title = stringResource(R.string.notifiche), description = stringResource(R.string.notifiche_rationale), granted = hasNotif, buttonLabel = stringResource(R.string.sblocca), onGrant = onGrantNotif)
 
         Spacer(Modifier.height(40.dp))
         Button(onClick = onNext, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().height(64.dp), colors = ButtonDefaults.buttonColors(containerColor = if (hasBt && hasNotif) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHighest, contentColor = if (hasBt && hasNotif) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant)) {
-            Text(if (hasBt && hasNotif) "Continua" else "Prosegui", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(if (hasBt && hasNotif) stringResource(R.string.continua) else stringResource(R.string.prosegui), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(8.dp))
             Icon(Icons.Default.ArrowForward, null, modifier = Modifier.size(20.dp))
         }
@@ -717,23 +723,24 @@ private fun CombinedPermissionPage(onGrantBt: () -> Unit, onGrantNotif: () -> Un
 @Composable
 private fun BatteryOptimizationPage(isIgnored: Boolean, onGrant: () -> Unit, onNext: () -> Unit) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 32.dp).padding(top = 64.dp, bottom = 140.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Surface(shape = RoundedCornerShape(36.dp), color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.size(120.dp)) {
             Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.BatteryAlert, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(64.dp)) }
         }
         Spacer(Modifier.height(32.dp))
-        Text("Libera l'App", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.libera_lapp), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
         Spacer(Modifier.height(8.dp))
-        Text("Evita che Android blocchi i trigger", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.evita_che_android_blocchi_i_trigger), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         Spacer(Modifier.height(24.dp))
         PermStatusChip(granted = isIgnored)
         Spacer(Modifier.height(32.dp))
 
         Surface(shape = RoundedCornerShape(32.dp), color = MaterialTheme.colorScheme.surfaceContainerLow) {
             Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                BatteryRow(Icons.Default.NightShelter, "Di notte Android entra in \"Doze\" e addormenta le app.")
-                BatteryRow(Icons.Default.Warning, "Questo bloccherebbe i trigger Bluetooth.")
-                BatteryRow(Icons.Default.CheckCircle, "Rimuovi l'ottimizzazione per avere trigger affidabili h24.")
+                BatteryRow(Icons.Default.NightShelter, stringResource(R.string.doze_addormenta))
+                BatteryRow(Icons.Default.Warning, stringResource(R.string.blocca_trigger_bt))
+                BatteryRow(Icons.Default.CheckCircle, stringResource(R.string.rimuovi_ottimizzazione_h24))
             }
         }
         Spacer(Modifier.height(40.dp))
@@ -742,13 +749,13 @@ private fun BatteryOptimizationPage(isIgnored: Boolean, onGrant: () -> Unit, onN
                 Button(onClick = onGrant, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().height(64.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
                     Icon(Icons.Default.BatterySaver, null, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(12.dp))
-                    Text("Disattiva ottimizzazione", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.disattiva_ottimizzazione), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
                 Spacer(Modifier.height(12.dp))
             }
         }
         Button(onClick = onNext, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().height(64.dp), colors = ButtonDefaults.buttonColors(containerColor = if (isIgnored) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHighest, contentColor = if (isIgnored) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant)) {
-            Text(if (isIgnored) "Continua" else "Più tardi", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(if (isIgnored) stringResource(R.string.continua) else stringResource(R.string.piu_tardi), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(8.dp))
             Icon(Icons.Default.ArrowForward, null, modifier = Modifier.size(20.dp))
         }
@@ -757,7 +764,7 @@ private fun BatteryOptimizationPage(isIgnored: Boolean, onGrant: () -> Unit, onN
 
 @Composable
 private fun AllDonePage(hasFineLoc: Boolean, hasBgLoc: Boolean, hasBt: Boolean, hasNotif: Boolean, hasBattOpt: Boolean, onFinish: () -> Unit) {
-    val infiniteTransition = rememberInfiniteTransition(label = "done_spin")
+    val infiniteTransition = rememberInfiniteTransition(label = "donespin")
     val rot by infiniteTransition.animateFloat(initialValue = 0f, targetValue = 360f, animationSpec = infiniteRepeatable(tween(10000, easing = LinearEasing)), label = "rot")
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
@@ -772,26 +779,26 @@ private fun AllDonePage(hasFineLoc: Boolean, hasBgLoc: Boolean, hasBt: Boolean, 
         Spacer(Modifier.height(40.dp))
         AnimatedVisibility(visible = visible, enter = fadeIn(tween(600)) + slideInVertically { it / 3 }) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Sei a Bordo!", style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                Text(stringResource(R.string.sei_a_bordo), style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(12.dp))
-                Text("Tutto configurato alla perfezione.", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                Text(stringResource(R.string.tutto_configurato_alla_perfezione), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
             }
         }
         Spacer(Modifier.height(40.dp))
         Surface(shape = RoundedCornerShape(32.dp), color = MaterialTheme.colorScheme.surfaceContainerLow) {
             Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                SummaryRow("GPS Preciso", Icons.Default.GpsFixed, hasFineLoc)
-                SummaryRow("GPS in Background", Icons.Default.LocationOn, hasBgLoc)
-                SummaryRow("Bluetooth", Icons.Default.Bluetooth, hasBt)
-                SummaryRow("Notifiche", Icons.Default.Notifications, hasNotif)
-                SummaryRow("Batteria Ottimizzata", Icons.Default.BatterySaver, hasBattOpt)
+                SummaryRow(stringResource(R.string.gps_preciso), Icons.Default.GpsFixed, hasFineLoc)
+                SummaryRow(stringResource(R.string.gps_background), Icons.Default.LocationOn, hasBgLoc)
+                SummaryRow(stringResource(R.string.bluetooth), Icons.Default.Bluetooth, hasBt)
+                SummaryRow(stringResource(R.string.notifiche), Icons.Default.Notifications, hasNotif)
+                SummaryRow(stringResource(R.string.batteria_ottimizzata), Icons.Default.BatterySaver, hasBattOpt)
             }
         }
         Spacer(Modifier.height(48.dp))
         Button(onClick = onFinish, shape = RoundedCornerShape(100.dp), modifier = Modifier.fillMaxWidth().height(64.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
             Icon(Icons.Default.DirectionsCar, null, modifier = Modifier.size(24.dp))
             Spacer(Modifier.width(12.dp))
-            Text("Inizia a parcheggiare", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.inizia_a_parcheggiare), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -804,6 +811,7 @@ data class InfoStep(val icon: ImageVector, val color: Color, val heading: String
 @Composable
 private fun InfoPage(eyebrow: String, title: String, subtitle: String, steps: List<InfoStep>, onNext: () -> Unit) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 32.dp).padding(top = 64.dp, bottom = 140.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Surface(shape = RoundedCornerShape(100.dp), color = MaterialTheme.colorScheme.secondaryContainer) {
             Text(eyebrow.uppercase(), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
@@ -820,7 +828,7 @@ private fun InfoPage(eyebrow: String, title: String, subtitle: String, steps: Li
         }
         Spacer(Modifier.height(48.dp))
         Button(onClick = onNext, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().height(64.dp)) {
-            Text("Prossimo", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.prossimo), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(12.dp))
             Icon(Icons.Default.ArrowForward, null, modifier = Modifier.size(20.dp))
         }
@@ -853,7 +861,7 @@ private fun PermStatusChip(granted: Boolean) {
     Surface(shape = RoundedCornerShape(100.dp), color = if (granted) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f)) {
         Row(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(if (granted) Icons.Default.CheckCircle else Icons.Default.Cancel, null, tint = if (granted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onErrorContainer, modifier = Modifier.size(20.dp))
-            Text(if (granted) "Permesso Attivo" else "Permesso Richiesto", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = if (granted) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer)
+            Text(if (granted) stringResource(R.string.permesso_attivo) else stringResource(R.string.permesso_richiesto), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = if (granted) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer)
         }
     }
 }
@@ -919,7 +927,7 @@ private fun PageDots(pagerState: PagerState, totalPages: Int) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         repeat(totalPages) { index ->
             val selected = pagerState.currentPage == index
-            val widthAnim by animateDpAsState(targetValue = if (selected) 32.dp else 8.dp, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy), label = "dot_width")
+            val widthAnim by animateDpAsState(targetValue = if (selected) 32.dp else 8.dp, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy), label = "dotwidth")
             Box(modifier = Modifier.height(8.dp).width(widthAnim).clip(CircleShape).background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant))
         }
     }

@@ -7,6 +7,10 @@ import com.cuscus.cussiparking.repository.CussiParkingRepository
 import com.cuscus.cussiparking.trigger.ParkingNotificationHelper
 
 class CussiParkingApplication : Application() {
+    companion object {
+        lateinit var instance: CussiParkingApplication
+            private set
+    }
 
     val settingsManager by lazy { SettingsManager(this) }
 
@@ -22,6 +26,7 @@ class CussiParkingApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
         // Crea i canali notifica al primo avvio (operazione idempotente su Android 8+)
         ParkingNotificationHelper.createChannels(this)
     }

@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.cuscus.cussiparking.R
+import com.cuscus.cussiparking.CussiParkingApplication
 
 class VehicleMembersViewModel(
     private val repository: CussiParkingRepository,
@@ -59,7 +61,11 @@ class VehicleMembersViewModel(
             _isLoading.value = true
             val result = repository.addMember(vehicleServerId, username, profileId)
             _isLoading.value = false
-            result.onSuccess { _feedbackMessage.value = "✓ $username aggiunto!"; fetchMembers(); onSuccess() }
+            result.onSuccess {
+                _feedbackMessage.value = CussiParkingApplication.instance.getString(R.string.utente_aggiunto_successo, username)
+                fetchMembers()
+                onSuccess()
+            }
             result.onFailure { _feedbackMessage.value = it.message }
         }
     }
@@ -69,7 +75,10 @@ class VehicleMembersViewModel(
             _isLoading.value = true
             val result = repository.removeMember(vehicleServerId, member.id, profileId)
             _isLoading.value = false
-            result.onSuccess { _feedbackMessage.value = "✓ ${member.username} rimosso."; fetchMembers() }
+            result.onSuccess {
+                _feedbackMessage.value = CussiParkingApplication.instance.getString(R.string.utente_rimosso_successo, member.username)
+                fetchMembers()
+            }
             result.onFailure { _feedbackMessage.value = it.message }
         }
     }
