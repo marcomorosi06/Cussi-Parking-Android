@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Cussi Parking</string>
+
+    <string name="server_url">Indirizzo Server (es. https://tua-auto.duckdns.org)</string>
+    <string name="email">Indirizzo Email</string>
+    <string name="password">Password</string>
+    <string name="login">Accedi</string>
+    <string name="save_settings">Salva Impostazioni</string>
+
+    <string name="park_here">Parcheggia Qui</string>
+    <string name="add_vehicle">Aggiungi Veicolo</string>
+    <string name="vehicle_name">Nome Veicolo</string>
+
+    <string name="error_no_server">Configura prima l\'URL del tuo server nelle impostazioni.</string>
+    <string name="register">Registrati</string>
+    <string name="dont_have_account">Non hai un account? Registrati</string>
+    <string name="already_have_account">Hai già un account? Accedi</string>
+    <string name="start_local">Inizia (Locale)</string>
+    <string name="confirm_password">Conferma Password</string>
+    <string name="passwords_do_not_match">Le password non coincidono.</string>
+    <string name="online_mode">Modalità Online</string>
+    <string name="offline_mode">Modalità Offline</string>
+</resources>
