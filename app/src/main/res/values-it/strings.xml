@@ -336,4 +336,10 @@
     <string name="non_visibile_agli_altri">Non visibile agli altri</string>
     <string name="modalita_offline_locale">Modalità offline: salvato in locale.</string>
     <string name="nessun_server_locale">Nessun server: salvato in locale.</string>
+    <string name="accedi_a">Accedi a %1$s</string>
+    <string name="registrati_a">Registrati su %1$s</string>
+    <string name="collegamento_tag_auto">\"%1$s\" — a quale auto vuoi collegarlo?</string>
+    <string name="posizione_salvata_per">Posizione salvata per %1$s!</string>
+    <string name="elimina_veicolo_titolo">Elimina veicolo</string>
+    <string name="elimina_veicolo_descrizione">Sei sicuro di voler eliminare \"%1$s\"? Questa azione non può essere annullata.</string>
 </resources>

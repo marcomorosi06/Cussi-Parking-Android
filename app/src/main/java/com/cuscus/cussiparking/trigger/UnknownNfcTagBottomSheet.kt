@@ -115,7 +115,7 @@ fun UnknownNfcTagBottomSheet(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        "\"$tagLabel\" — a quale auto vuoi collegarlo?",
+                        text = stringResource(R.string.collegamento_tag_auto, tagLabel),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -170,7 +170,13 @@ fun UnknownNfcTagBottomSheet(
                                 modifier          = Modifier.padding(horizontal = 16.dp, vertical = 13.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(vehicle.icon, style = MaterialTheme.typography.titleMedium)
+                                Icon(
+                                    imageVector = Icons.Default.DirectionsCar,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp),
+                                    tint = if (isSelected) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
                                     vehicle.name,
@@ -244,7 +250,10 @@ fun UnknownNfcTagBottomSheet(
                                 modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "Posizione salvata per ${selectedVehicle?.name}!",
+                                text = stringResource(
+                                    R.string.posizione_salvata_per,
+                                    selectedVehicle?.name ?: ""
+                                ),
                                 style      = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color      = MaterialTheme.colorScheme.onPrimaryContainer
@@ -253,7 +262,7 @@ fun UnknownNfcTagBottomSheet(
                     }
                 } else {
                     Row(
-                        modifier              = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         TextButton(

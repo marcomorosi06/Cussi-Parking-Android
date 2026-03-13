@@ -165,6 +165,7 @@ fun HomeScreen(
     val context         = LocalContext.current
     val app             = context.applicationContext as CussiParkingApplication
     val settingsManager = app.settingsManager
+    var vehicleToDelete by remember { mutableStateOf<Vehicle?>(null) }
 
     val vehicles            by viewModel.vehicles.collectAsState()
     val isLoading           by viewModel.isLoading.collectAsState()
@@ -318,7 +319,7 @@ fun HomeScreen(
                                             showServerBadge  = loggedProfiles.size > 1,
                                             onParkGps        = { lat, lng -> viewModel.parkVehicle(vehicle.id, lat, lng) },
                                             onParkMap        = { vehicleForMap = vehicle },
-                                            onDelete         = { viewModel.deleteVehicle(vehicle.id) },
+                                            onDelete         = { vehicleToDelete = vehicle },
                                             onManageMembers  = {
                                                 vehicle.serverId?.let { sid ->
                                                     val pid = vehicle.serverProfileId ?: return@let
@@ -381,6 +382,55 @@ fun HomeScreen(
                 showJoinByCodeDialog = false
                 viewModel.clearJoinResult()
                 viewModel.fetchLocations()
+            }
+        )
+    }
+    vehicleToDelete?.let { vehicle ->
+        AlertDialog(
+            onDismissRequest = { vehicleToDelete = null },
+            icon = {
+                Icon(
+                    Icons.Default.DeleteForever,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.elimina_veicolo_titolo),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.elimina_veicolo_descrizione, vehicle.name),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            shape = RoundedCornerShape(24.dp), // Stile coerente con il resto dell'app
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.deleteVehicle(vehicle.id)
+                        vehicleToDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(stringResource(R.string.elimina), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { vehicleToDelete = null }
+                ) {
+                    Text(stringResource(R.string.annulla), fontWeight = FontWeight.Bold)
+                }
             }
         )
     }
@@ -671,7 +721,7 @@ fun VehicleCard(
                             onClick = {
                                 val uri = Uri.parse("geo:${vehicle.lat},${vehicle.lng}?q=${vehicle.lat},${vehicle.lng}(${Uri.encode(vehicle.name)})")
                                 try { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) }
-                                catch (_: Exception) { Toast.makeText(context, "Nessuna app trovata", Toast.LENGTH_SHORT).show() }
+                                catch (_: Exception) { Toast.makeText(context, "No app found.", Toast.LENGTH_SHORT).show() }
                             },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),

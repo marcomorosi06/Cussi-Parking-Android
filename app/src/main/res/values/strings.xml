@@ -336,4 +336,10 @@
     <string name="non_visibile_agli_altri">Not visible to others</string>
     <string name="modalita_offline_locale">Offline mode: saved locally.</string>
     <string name="nessun_server_locale">No server: saved locally.</string>
+    <string name="accedi_a">Login into %1$s</string>
+    <string name="registrati_a">Register into %1$s</string>
+    <string name="collegamento_tag_auto">\"%1$s\" — which car do you want to link it to?</string>
+    <string name="posizione_salvata_per">Location saved for %1$s!</string>
+    <string name="elimina_veicolo_titolo">Delete vehicle</string>
+    <string name="elimina_veicolo_descrizione">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
 </resources>

@@ -82,7 +82,7 @@ fun AuthScreen(
                             )
                             if (label != null) {
                                 Text(
-                                    "Accedi a $label",
+                                    stringResource(R.string.accedi_a,label),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                 )
@@ -209,73 +209,6 @@ fun AuthScreen(
                                 )
                             }
                         }
-                    }
-                }
-            }
-
-            // ── Offline toggle ─────────────────────────────────
-            AnimatedVisibility(
-                visible = visible,
-                enter = slideInVertically(
-                    initialOffsetY = { it / 2 },
-                    animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMediumLow)
-                ) + fadeIn()
-            ) {
-                Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainer,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            AnimatedContent(
-                                targetState = isOffline,
-                                transitionSpec = {
-                                    scaleIn(bouncySpring) + fadeIn() togetherWith scaleOut() + fadeOut()
-                                },
-                                label = "offlineicon"
-                            ) { offline ->
-                                Icon(
-                                    if (offline) Icons.Default.WifiOff else Icons.Default.Wifi,
-                                    contentDescription = null,
-                                    tint = if (offline)
-                                        MaterialTheme.colorScheme.secondary
-                                    else
-                                        MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(14.dp))
-                            Column {
-                                Text(
-                                    stringResource(if (isOffline) R.string.offline_mode else R.string.online_mode),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                AnimatedContent(
-                                    targetState = isOffline,
-                                    transitionSpec = {
-                                        slideInVertically { -it } + fadeIn() togetherWith
-                                                slideOutVertically { it } + fadeOut()
-                                    },
-                                    label = "offlinesub"
-                                ) { offline ->
-                                    Text(
-                                        if (offline) "Nessun server necessario" else "Connessione al server attiva",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        }
-                        Switch(
-                            checked = !isOffline,
-                            onCheckedChange = { viewModel.settingsManager.setOfflineMode(!it) }
-                        )
                     }
                 }
             }
@@ -456,7 +389,7 @@ fun RegisterScreen(
                         Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold)
                         if (profile != null) {
                             Text(
-                                "Registrati su ${profile.label}",
+                                stringResource(R.string.registrati_a,profile.label),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                             )
