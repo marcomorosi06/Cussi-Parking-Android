@@ -455,4 +455,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-Made with <3 by [marcomorosi06](https://github.com/marcomorosi06)
+Made with <3 by [Marco Morosi](https://github.com/marcomorosi06)
