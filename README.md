@@ -361,7 +361,7 @@ Cussi Parking requires the **[Cussi Parking Server](https://github.com/marcomoro
 
 ```bash
 
-git clone \[https://github.com/marcomorosi06/Cussi-Parking-Server.git](https://github.com/marcomorosi06/Cussi-Parking-Server.git)
+git clone https://github.com/marcomorosi06/Cussi-Parking-Server.git
 
 cd Cussi-Parking-Server
 
