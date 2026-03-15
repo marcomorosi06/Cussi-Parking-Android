@@ -11,7 +11,7 @@
 [![Material 3](https://img.shields.io/badge/Material%203-Expressive-6750A4)](https://m3.material.io/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Server](https://img.shields.io/badge/Backend-Cussi--Parking--Server-6C47FF?logo=github&logoColor=white)](https://github.com/marcomorosi06/Cussi-Parking-Server)
-
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/marcomorosi)
 </div>
 
 ---
@@ -407,7 +407,11 @@ All responses are JSON. All requests are form-encoded POST with a `token` field 
 
 ## Contributing
 
-Pull requests are welcome. If you find a bug or have a feature idea, please open an issue first to discuss it.
+Cussi Parking is completely free, open-source, and privacy-focused. If this app saved you from losing your car (or just saved you a headache), consider buying me a coffee to support its development!
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/marcomorosi)
+
+## Building from Android Studio
 
 ```bash
 
