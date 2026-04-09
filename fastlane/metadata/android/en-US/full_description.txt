@@ -1,0 +1,37 @@
+Never lose your car again. Cussi Parking automatically saves your vehicle's location the moment you leave it — no tapping, no forgetting.
+
+<b>How it works</b>
+Cussi Parking listens for signals that mean you just parked: your car's Bluetooth kit disconnecting from your phone, or a tap on an NFC sticker on your dashboard. When it detects one, it saves your GPS coordinates silently in the background. Open the app later and you'll know exactly where your car is.
+
+<b>Automatic Triggers</b>
+• <b>Bluetooth trigger</b> — position is saved automatically when your car's hands-free kit disconnects
+• <b>NFC trigger</b> — tap a cheap NFC sticker on your windshield before stepping out, and the spot is saved instantly
+• <b>Manual save</b> — long-press any point on the map, or tap the GPS button to save your current location on the spot
+
+<b>Privacy by Design</b>
+Your location data never touches third-party servers. Cussi Parking is fully open-source, and you can run it completely offline — all data stays on your device. If you want sync across devices, you connect to your own self-hosted server. You own your data, always.
+
+<b>Share with Family or Colleagues</b>
+Share a vehicle's parking spot with other people via a simple invite code. Everyone with access sees the latest saved location in real time. Roles (owner / member) let you control who can update or manage the vehicle.
+
+<b>Multi-Server Support</b>
+Connect to multiple self-hosted servers at once — for example, one for home and one for work. All vehicles appear together on the same map.
+
+<b>Offline Mode</b>
+No internet? No problem. All features work without a server. If you add a server later, positions saved offline are automatically synced on the next connection.
+
+<b>Key Features</b>
+• Automatic save on Bluetooth disconnect or NFC tap
+• OpenStreetMap — no Google Maps or API key needed
+• Works fully offline, no account required
+• Self-hosted backend (PHP + SQLite, runs on a Raspberry Pi)
+• Vehicle sharing with invite codes and role management
+• Connect to multiple servers simultaneously
+• Rich notifications for every trigger event
+• Material 3 Expressive design with adaptive theming
+• No ads, no analytics, no telemetry
+
+<b>Requirements</b>
+Android 8.0 or higher. Automatic triggers require Background Location permission. Bluetooth trigger requires a paired Bluetooth device. NFC trigger requires NFC hardware (optional — the app works fine without it).
+
+Open source · MIT License · github.com/marcomorosi06/Cussi-Parking-Android

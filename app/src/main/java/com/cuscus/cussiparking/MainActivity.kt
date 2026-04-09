@@ -45,8 +45,6 @@ class MainActivity : ComponentActivity() {
 
     private var nfcAdapter: NfcAdapter? = null
 
-    // Non-null solo durante la modalità scrittura tag (VehicleTriggersScreen → startNfcWrite)
-    // Triple<vehicleId, vehicleName, locationMode>
     private var pendingNfcWrite: Triple<Int, String, String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,10 +62,6 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val startDest = if (settingsManager.isOnboardingCompleted()) "home" else "welcome_screen"
 
-                    // ── Tag NFC sconosciuto ───────────────────────────────────────────
-                    // La lista veicoli è caricata una volta sola; il bottom sheet appare
-                    // solo quando pending != null. notify() è idempotente: avvicinare di
-                    // nuovo il tag mentre il sheet è aperto non fa nulla.
                     val unknownTag by UnknownNfcTagState.pending.collectAsState()
                     val allVehicles by produceState<List<VehicleEntity>>(initialValue = emptyList()) {
                         value = appContainer.database.vehicleDao().getAllVehicles()
@@ -77,9 +71,6 @@ class MainActivity : ComponentActivity() {
                             tagData    = unknownTag!!,
                             vehicles   = allVehicles,
                             triggerDao = appContainer.database.triggerDao(),
-                            // onDismiss è chiamato dal bottom sheet DOPO che l'animazione
-                            // di chiusura è completata (sheetState.hide() awaited).
-                            // Solo in quel momento consume() azzera il pending.
                             onDismiss  = { UnknownNfcTagState.consume() }
                         )
                     }
@@ -262,14 +253,11 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Gestisce il caso app aperta da un tag NFC (intent iniziale)
         NfcTriggerHandler.handleIntent(this, intent)
     }
 
     // ─────────────────────────────────────────────────────────────────────────
     // NFC — SCRITTURA TAG
-    // Il foreground dispatch viene abilitato SOLO qui, per la scrittura.
-    // Per la lettura normale non serve: funziona tramite intent-filter del manifest.
     // ─────────────────────────────────────────────────────────────────────────
 
     fun startNfcWrite(vehicleId: Int, vehicleName: String, locationMode: String) {
@@ -285,8 +273,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Riabilita il foreground dispatch SOLO se c'è una scrittura tag in attesa.
-        // Non lo abilitiamo mai per la lettura: evita il loop di intent continui.
         if (pendingNfcWrite != null) {
             val pi = PendingIntent.getActivity(
                 this, 0,
@@ -299,7 +285,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
-        // Disabilita sempre: se c'era una scrittura in sospeso verrà riabilitata in onResume
         nfcAdapter?.disableForegroundDispatch(this)
     }
 
@@ -327,13 +312,6 @@ class MainActivity : ComponentActivity() {
             nfcAdapter?.disableForegroundDispatch(this)
 
         } else {
-            // ── Modalità LETTURA ──────────────────────────────────────────────
-            // NfcTriggerHandler:
-            //   - tag noto    → WorkManager (salva posizione)
-            //   - tag ignoto  → UnknownNfcTagState.notify() → bottom sheet
-            //
-            // notify() è idempotente: se pending != null (sheet già aperto)
-            // non fa nulla. Nessuna gestione aggiuntiva necessaria qui.
             NfcTriggerHandler.handleIntent(this, intent)
         }
     }

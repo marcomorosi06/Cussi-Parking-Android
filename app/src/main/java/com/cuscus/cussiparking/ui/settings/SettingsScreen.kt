@@ -1,10 +1,3 @@
-/*
- * SettingsScreen.kt — Material 3 Expressive Rewrite
- * - Design allineato al resto dell'app
- * - Selettore mappa per coordinate custom
- * - Dialog → BottomSheet per Aggiungi Server
- * - Full feature parity maintained
- */
 package com.cuscus.cussiparking.ui.settings
 
 import androidx.annotation.StringRes
@@ -59,17 +52,11 @@ enum class MapThemeMode(@StringRes val labelResId: Int) {
     DARK(R.string.tema_scuro)
 }
 
-// ─────────────────────────────────────────────
-// Spring specs
-// ─────────────────────────────────────────────
 private val bouncySpring = spring<Float>(
     dampingRatio = Spring.DampingRatioMediumBouncy,
     stiffness    = Spring.StiffnessMedium
 )
 
-// ─────────────────────────────────────────────
-// SETTINGS SCREEN
-// ─────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -91,11 +78,9 @@ fun SettingsScreen(
     var profileToRename          by remember { mutableStateOf<ServerProfile?>(null) }
     var profileToDeleteAccount   by remember { mutableStateOf<ServerProfile?>(null) }
 
-    // Coordinate custom (state locale per editing)
     var customLatInput by remember { mutableStateOf(settingsManager.customLat.value.toString()) }
     var customLngInput by remember { mutableStateOf(settingsManager.customLng.value.toString()) }
 
-    // Se l'utente apre il map picker mostriamo l'overlay fullscreen
     if (showMapPicker) {
         CustomLocationMapPicker(
             initialLat = settingsManager.customLat.collectAsState().value,
@@ -142,9 +127,6 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
-            // ══════════════════════════════════════════
-            // SEZIONE: SERVER COLLEGATI
-            // ══════════════════════════════════════════
             item {
                 SectionHeader(icon = Icons.Default.Storage, title = stringResource(R.string.server_collegati))
             }
@@ -198,9 +180,6 @@ fun SettingsScreen(
                 )
             }
 
-            // ══════════════════════════════════════════
-            // SEZIONE: SINCRONIZZAZIONE
-            // ══════════════════════════════════════════
             item {
                 SectionHeader(icon = Icons.Default.Sync, title = stringResource(R.string.sincronizzazione))
             }
@@ -280,9 +259,6 @@ fun SettingsScreen(
                 )
             }
 
-            // ══════════════════════════════════════════
-            // SEZIONE: MAPPA
-            // ══════════════════════════════════════════
             item {
                 SectionHeader(icon = Icons.Default.Map, title = stringResource(R.string.mappa))
             }
@@ -307,7 +283,6 @@ fun SettingsScreen(
                             onSelect = { settingsManager.saveMapBehavior(it) }
                         )
 
-                        // ── Pannello coordinate custom ────────
                         AnimatedVisibility(
                             visible = mapBehavior == "custom",
                             enter = expandVertically(
@@ -317,7 +292,6 @@ fun SettingsScreen(
                         ) {
                             Column(modifier = Modifier.padding(top = 16.dp)) {
 
-                                // Anteprima coordinate salvate
                                 val savedLat by settingsManager.customLat.collectAsState()
                                 val savedLng by settingsManager.customLng.collectAsState()
                                 val hasCoords = savedLat != 0.0 || savedLng != 0.0
@@ -357,7 +331,6 @@ fun SettingsScreen(
                                     Spacer(modifier = Modifier.height(10.dp))
                                 }
 
-                                // Bottone selettore mappa — CTA principale
                                 Button(
                                     onClick = { showMapPicker = true },
                                     modifier = Modifier.fillMaxWidth(),
@@ -378,7 +351,6 @@ fun SettingsScreen(
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                // Input manuale come alternativa secondaria
                                 Text(
                                     stringResource(R.string.oppure_inserisci_manualmente),
                                     style = MaterialTheme.typography.labelSmall,
@@ -447,7 +419,6 @@ fun SettingsScreen(
                 }
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Sezione Info & Supporto
                 Text(
                     stringResource(R.string.info_app),
                     style = MaterialTheme.typography.labelSmall,
@@ -456,9 +427,8 @@ fun SettingsScreen(
                     modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
                 )
 
-                // Bottone "Rivedi Tutorial"
                 ElevatedCard(
-                    onClick = onNavigateToWelcome, // <--- Avvia il tutorial
+                    onClick = onNavigateToWelcome,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.elevatedCardColors(
@@ -476,7 +446,7 @@ fun SettingsScreen(
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    Icons.Default.School, // O Icons.Default.Info
+                                    Icons.Default.School,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary
                                 )
@@ -491,7 +461,6 @@ fun SettingsScreen(
                     }
                 }
 
-                // In fondo a tutto, il footer animato
                 MadeWithLoveFooter()
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -501,7 +470,6 @@ fun SettingsScreen(
         }
     }
 
-    // ── Bottom Sheet: Aggiungi Server ─────────────────
     if (showAddServerSheet) {
         AddServerBottomSheet(
             onDismiss = { showAddServerSheet = false },
@@ -513,7 +481,6 @@ fun SettingsScreen(
         )
     }
 
-    // ── Dialog: Rinomina Profilo ───────────────────────
     profileToRename?.let { profile ->
         RenameProfileDialog(
             currentLabel = profile.label,
@@ -525,7 +492,6 @@ fun SettingsScreen(
         )
     }
 
-    // ── Dialog: Elimina Account ────────────────────────
     profileToDeleteAccount?.let { profile ->
         DeleteAccountDialog(
             profile   = profile,
@@ -539,7 +505,6 @@ fun SettingsScreen(
         )
     }
 
-    // ── Dialog: Rimuovi Profilo ────────────────────────
     profileToDelete?.let { profile ->
         RemoveProfileDialog(
             profile   = profile,
@@ -549,11 +514,6 @@ fun SettingsScreen(
     }
 }
 
-// ─────────────────────────────────────────────
-// CUSTOM LOCATION MAP PICKER
-// Stesso stile di MapSelectionOverlay:
-// CartoDB Positron, pin animato, layout asimmetrico
-// ─────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CustomLocationMapPicker(
@@ -603,7 +563,6 @@ private fun CustomLocationMapPicker(
         label = "shadowscale"
     )
 
-    // ── GESTIONE DINAMICA TILES ──
     val isSystemDark = androidx.compose.foundation.isSystemInDarkTheme()
     val isDarkMap = when (mapThemeMode) {
         MapThemeMode.SYSTEM -> isSystemDark
@@ -649,7 +608,6 @@ private fun CustomLocationMapPicker(
                     }
                 },
                 actions = {
-                    // Menu Tema
                     Box {
                         IconButton(onClick = { showThemeMenu = true }) {
                             Icon(
@@ -675,7 +633,6 @@ private fun CustomLocationMapPicker(
                         }
                     }
 
-                    // Menu Provider
                     Box {
                         IconButton(onClick = { showProviderMenu = true }) {
                             Icon(Icons.Default.Layers, contentDescription = stringResource(R.string.stile_mappa))
@@ -702,7 +659,6 @@ private fun CustomLocationMapPicker(
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
 
-            // ── MAPPA ──────────────────────────────────
             AndroidView(
                 modifier = Modifier.fillMaxSize(),
                 factory = { ctx ->
@@ -726,7 +682,6 @@ private fun CustomLocationMapPicker(
                     }
                 },
                 update = { mapView ->
-                    // Aggiorna la sorgente tile istantaneamente
                     mapView.setTileSource(currentTileSource)
                     mapView.invalidate()
                 }
@@ -734,7 +689,6 @@ private fun CustomLocationMapPicker(
 
             // ── PIN CENTRALE ANIMATO ────────────────────
             Box(modifier = Modifier.align(Alignment.Center)) {
-                // Ombra (disegnata sotto, perfettamente centrata allo zero)
                 Box(
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -745,7 +699,6 @@ private fun CustomLocationMapPicker(
                             shape = RoundedCornerShape(50)
                         )
                 )
-                // Icona Pin (disegnata sopra, si sposta in alto per poggiare la punta al centro)
                 Icon(
                     Icons.Default.LocationOn,
                     contentDescription = stringResource(R.string.posizione),
@@ -757,14 +710,12 @@ private fun CustomLocationMapPicker(
                 )
             }
 
-            // ── CONTROLLI IN BASSO ──────────────────────
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(horizontal = 20.dp, vertical = 32.dp)
                     .fillMaxWidth()
             ) {
-                // Pill coordinate eleganti centrate in alto
                 Surface(
                     shape = RoundedCornerShape(16.dp),
                     color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f),
@@ -785,13 +736,11 @@ private fun CustomLocationMapPicker(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Layout asimmetrico: ricerca a sinistra, CTA a destra
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    // Azione secondaria: input manuale
                     SmallFloatingActionButton(
                         onClick = { showManualInput = true },
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -801,7 +750,6 @@ private fun CustomLocationMapPicker(
                         Icon(Icons.Default.Search, contentDescription = stringResource(R.string.inserisci_coordinate))
                     }
 
-                    // CTA primaria grande ed espressiva
                     ExtendedFloatingActionButton(
                         onClick = { onConfirm(currentCenter.latitude, currentCenter.longitude) },
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -874,9 +822,6 @@ private fun CustomLocationMapPicker(
     }
 }
 
-// ─────────────────────────────────────────────
-// BOTTOM SHEET: Aggiungi Server
-// ─────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddServerBottomSheet(
@@ -977,9 +922,6 @@ private fun AddServerBottomSheet(
     }
 }
 
-// ─────────────────────────────────────────────
-// SERVER PROFILE CARD
-// ─────────────────────────────────────────────
 @Composable
 private fun ServerProfileCard(
     profile: ServerProfile,
@@ -1008,7 +950,6 @@ private fun ServerProfileCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // ── Header ────────────────────────────────
             Row(
                 modifier          = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -1079,7 +1020,6 @@ private fun ServerProfileCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // ── Status bar ────────────────────────────
             AnimatedContent(
                 targetState  = isLoggedIn,
                 transitionSpec = {
@@ -1165,9 +1105,6 @@ private fun ServerProfileCard(
     }
 }
 
-// ─────────────────────────────────────────────
-// DIALOG: Rinomina Profilo
-// ─────────────────────────────────────────────
 @Composable
 private fun RenameProfileDialog(
     currentLabel: String,
@@ -1202,9 +1139,6 @@ private fun RenameProfileDialog(
     )
 }
 
-// ─────────────────────────────────────────────
-// DIALOG: Elimina Account
-// ─────────────────────────────────────────────
 @Composable
 private fun DeleteAccountDialog(
     profile: ServerProfile,
@@ -1285,9 +1219,6 @@ private fun DeleteAccountDialog(
     )
 }
 
-// ─────────────────────────────────────────────
-// DIALOG: Rimuovi Profilo
-// ─────────────────────────────────────────────
 @Composable
 private fun RemoveProfileDialog(
     profile: ServerProfile,
@@ -1320,9 +1251,6 @@ private fun RemoveProfileDialog(
     )
 }
 
-// ─────────────────────────────────────────────
-// Section Header
-// ─────────────────────────────────────────────
 @Composable
 private fun SectionHeader(icon: ImageVector, title: String) {
     Row(
@@ -1346,9 +1274,6 @@ private fun SectionHeader(icon: ImageVector, title: String) {
     }
 }
 
-// ─────────────────────────────────────────────
-// Settings Card wrapper
-// ─────────────────────────────────────────────
 @Composable
 private fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
     Card(
@@ -1361,9 +1286,6 @@ private fun SettingsCard(content: @Composable ColumnScope.() -> Unit) {
     }
 }
 
-// ─────────────────────────────────────────────
-// Animated Empty State
-// ─────────────────────────────────────────────
 @Composable
 private fun AnimatedEmptyState(icon: ImageVector, title: String, subtitle: String) {
     val pulse = rememberInfiniteTransition(label = "emptypulse")
@@ -1405,9 +1327,6 @@ private fun AnimatedEmptyState(icon: ImageVector, title: String, subtitle: Strin
     }
 }
 
-// ─────────────────────────────────────────────
-// ConnectedSegmentControl
-// ─────────────────────────────────────────────
 @Composable
 private fun ConnectedSegmentControl(
     options: List<Triple<String, String, ImageVector>>,
@@ -1477,9 +1396,6 @@ private fun ConnectedSegmentControl(
     }
 }
 
-// ─────────────────────────────────────────────
-// Shared: Expressive TextField
-// ─────────────────────────────────────────────
 @Composable
 private fun ExpressiveTextField(
     value: String,
@@ -1500,9 +1416,6 @@ private fun ExpressiveTextField(
     )
 }
 
-// ─────────────────────────────────────────────
-// Drag handle condiviso
-// ─────────────────────────────────────────────
 @Composable
 private fun SheetDragHandle() {
     Box(
@@ -1514,9 +1427,6 @@ private fun SheetDragHandle() {
     )
 }
 
-// ─────────────────────────────────────────────
-// Bouncy Icon Button
-// ─────────────────────────────────────────────
 @Composable
 private fun BouncyIconButton(onClick: () -> Unit, content: @Composable () -> Unit) {
     var pressed by remember { mutableStateOf(false) }
@@ -1538,14 +1448,12 @@ private fun BouncyIconButton(onClick: () -> Unit, content: @Composable () -> Uni
 fun MadeWithLoveFooter() {
     var isTriggered by remember { mutableStateOf(false) }
 
-    // Anima da 0 a 1 quando viene triggerato
     val mergeProgress by animateFloatAsState(
         targetValue = if (isTriggered) 1f else 0f,
         animationSpec = tween(800, easing = FastOutSlowInEasing),
         label = "mergeprogress"
     )
 
-    // Cuore che pulsa (inizia solo quando l'animazione di fusione è quasi finita)
     val infiniteTransition = rememberInfiniteTransition(label = "heartbeattransition")
     val heartPulse by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -1554,17 +1462,17 @@ fun MadeWithLoveFooter() {
             infiniteRepeatable(
                 animation = keyframes {
                     durationMillis = 1200
-                    1f at 0             // Inizio battito
-                    1.3f at 150         // TUM
-                    1f at 300           // (pausa brevissima)
-                    1.3f at 450         // TUM
-                    1f at 600           // Rilascio
-                    1f at 1200          // Pausa lunga prima del prossimo battito
+                    1f at 0             
+                    1.3f at 150         
+                    1f at 300           
+                    1.3f at 450         
+                    1f at 600           
+                    1f at 1200          
                 },
                 repeatMode = RepeatMode.Restart
             )
         } else {
-            infiniteRepeatable(tween(100)) // Fallback invisibile
+            infiniteRepeatable(tween(100))
         },
         label = "heartpulse"
     )
@@ -1582,13 +1490,11 @@ fun MadeWithLoveFooter() {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        // Il box magico dove avviene la trasformazione
         Box(contentAlignment = Alignment.Center, modifier = Modifier.width(32.dp)) {
             if (mergeProgress < 0.5f) {
-                // Fase 1: Il < e il 3 si avvicinano e ruotano
-                val phase1 = mergeProgress * 2f // normalizza da 0 a 1
-                val offset = phase1 * 8f // si spostano verso il centro
-                val rotation = phase1 * 45f // ruotano leggermente
+                val phase1 = mergeProgress * 2f 
+                val offset = phase1 * 8f 
+                val rotation = phase1 * 45f 
 
                 Row {
                     Text(
@@ -1611,15 +1517,14 @@ fun MadeWithLoveFooter() {
                     )
                 }
             } else {
-                // Fase 2: Appare l'icona Material e inizia a pulsare
-                val phase2 = (mergeProgress - 0.5f) * 2f // normalizza da 0 a 1
+                val phase2 = (mergeProgress - 0.5f) * 2f
                 Icon(
                     Icons.Default.Favorite,
                     contentDescription = stringResource(R.string.cuore),
-                    tint = Color(0xFFE63946), // Un bel rosso acceso!
+                    tint = Color(0xFFE63946),
                     modifier = Modifier
                         .size(18.dp)
-                        .scale(phase2 * heartPulse) // Appare gradualmente, poi batte
+                        .scale(phase2 * heartPulse)
                 )
             }
         }
@@ -1630,7 +1535,6 @@ fun MadeWithLoveFooter() {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        // Il tuo nome (Clickable per avviare la magia!)
         Text(
             stringResource(R.string.marco_morosi),
             style = MaterialTheme.typography.bodyMedium,

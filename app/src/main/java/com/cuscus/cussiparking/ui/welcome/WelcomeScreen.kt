@@ -63,7 +63,6 @@ fun WelcomeScreen(
     val context = LocalContext.current
     val scope   = rememberCoroutineScope()
 
-    // Ora abbiamo 10 pagine totali (aggiunta configurazione Server)
     val totalPages = 9
     val pagerState = rememberPagerState(pageCount = { totalPages })
 
@@ -186,7 +185,6 @@ fun WelcomeScreen(
 
                 PageDots(pagerState = pagerState, totalPages = totalPages)
 
-                // Mostra "Salta" solo sulle info e nascondilo sulla Configurazione Server (3) e Permissions
                 AnimatedVisibility(visible = pagerState.currentPage in 1..2 || pagerState.currentPage == 4) {
                     TextButton(onClick = { scope.launch { pagerState.animateScrollToPage(5) } }, shape = RoundedCornerShape(100.dp)) {
                         Text(stringResource(R.string.salta), color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
@@ -206,11 +204,10 @@ private fun HeroPage(onNext: () -> Unit) {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
-    // ── Animazione di Levitazione (Floating) ──
     val infiniteTransition = rememberInfiniteTransition(label = "heroanim")
     val floatOffsetY by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = -16f, // Fluttua verso l'alto di 16dp
+        targetValue = -16f,
         animationSpec = infiniteRepeatable(
             animation = tween(2500, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
@@ -218,7 +215,6 @@ private fun HeroPage(onNext: () -> Unit) {
         label = "floaty"
     )
 
-    // Un leggero bagliore che respira dietro il logo
     val glowScale by infiniteTransition.animateFloat(
         initialValue = 0.9f,
         targetValue = 1.2f,
@@ -244,7 +240,6 @@ private fun HeroPage(onNext: () -> Unit) {
             enter = fadeIn(tween(800)) + scaleIn(initialScale = 0.8f, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy))
         ) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.size(240.dp)) {
-                // Bagliore sfumato (Niente bordi rigidi)
                 Box(
                     modifier = Modifier
                         .size(180.dp)
@@ -259,13 +254,12 @@ private fun HeroPage(onNext: () -> Unit) {
                         )
                 )
 
-                // Il tuo logo che fluttua
                 Image(
                     painter = painterResource(id = R.drawable.app_logo),
                     contentDescription = stringResource(R.string.logo_cussiparking),
                     modifier = Modifier
                         .size(140.dp)
-                        .offset(y = floatOffsetY.dp), // Applica la levitazione
+                        .offset(y = floatOffsetY.dp),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
                 )
             }
@@ -281,9 +275,9 @@ private fun HeroPage(onNext: () -> Unit) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = stringResource(R.string.cussiparking),
-                    style = MaterialTheme.typography.displayMedium, // Massiccio ma senza esagerare
+                    style = MaterialTheme.typography.displayMedium,
                     fontWeight = FontWeight.Black,
-                    color = MaterialTheme.colorScheme.onSurface, // Colore solido e pulito
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(16.dp))
@@ -318,12 +312,6 @@ private fun HeroPage(onNext: () -> Unit) {
     }
 }
 
-// ─────────────────────────────────────────────
-// Page 1 & 2 — Info Pages
-// ─────────────────────────────────────────────
-// ─────────────────────────────────────────────
-// Page 1 — COME FUNZIONA
-// ─────────────────────────────────────────────
 @Composable
 private fun HowItWorksPage(onNext: () -> Unit) {
     InfoPage(
@@ -354,9 +342,6 @@ private fun HowItWorksPage(onNext: () -> Unit) {
     )
 }
 
-// ─────────────────────────────────────────────
-// Page 2 — SERVER PRIVATO & GITHUB
-// ─────────────────────────────────────────────
 @Composable
 private fun PrivateServerPage(onNext: () -> Unit) {
     val uriHandler = LocalUriHandler.current
@@ -408,10 +393,8 @@ private fun PrivateServerPage(onNext: () -> Unit) {
 
         Spacer(Modifier.height(32.dp))
 
-        // Pulsante GitHub
         OutlinedButton(
             onClick = {
-                // INSERISCI QUI IL TUO VERO LINK GITHUB
                 uriHandler.openUri("https://github.com/marcomorosi06/Cussi-Parking-Server")
             },
             shape = RoundedCornerShape(20.dp),
@@ -463,10 +446,8 @@ private fun MultiProfilePage(onNext: () -> Unit) {
 
         Spacer(Modifier.height(32.dp))
 
-        // Pulsante GitHub
         OutlinedButton(
             onClick = {
-                // INSERISCI QUI IL LINK AL TUO REPO GITHUB!
                 uriHandler.openUri("https://github.com/")
             },
             shape = RoundedCornerShape(20.dp),
@@ -487,14 +468,11 @@ private fun MultiProfilePage(onNext: () -> Unit) {
     }
 }
 
-// ─────────────────────────────────────────────
-// Page 3 — SETUP SERVER & OFFLINE
-// ─────────────────────────────────────────────
 @Composable
 private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
-    var isCloudSelected by remember { mutableStateOf<Boolean?>(null) } // null = nessuna scelta
+    var isCloudSelected by remember { mutableStateOf<Boolean?>(null) }
 
     var serverLabel by remember { mutableStateOf("") }
     var serverUrl by remember { mutableStateOf("https://") }
@@ -514,7 +492,6 @@ private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) 
 
         Spacer(Modifier.height(40.dp))
 
-        // Card Offline (Configura in seguito)
         ModeSelectionCard(
             icon = Icons.Default.PhoneAndroid,
             title = stringResource(R.string.configura_in_seguito),
@@ -525,7 +502,6 @@ private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) 
 
         Spacer(Modifier.height(16.dp))
 
-        // Card Cloud (Collega Server)
         ModeSelectionCard(
             icon = Icons.Default.Storage,
             title = stringResource(R.string.collega_server),
@@ -534,7 +510,6 @@ private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) 
             onClick = { isCloudSelected = true }
         )
 
-        // Campi input Server
         AnimatedVisibility(visible = isCloudSelected == true, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
             Column(modifier = Modifier.padding(top = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 OutlinedTextField(
@@ -554,8 +529,7 @@ private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) 
         }
 
         Spacer(Modifier.height(48.dp))
-
-        // Pulsante visibile solo se è stata fatta una scelta
+        
         AnimatedVisibility(visible = isCloudSelected != null) {
             Button(
                 onClick = {
@@ -565,7 +539,6 @@ private fun SetupModePage(settingsManager: SettingsManager, onNext: () -> Unit) 
                     } else {
                         if (serverUrl.length > 8) {
                             settingsManager.setOfflineMode(false)
-                            // Aggiunge il profilo in attesa di login. Mette una mail vuota temporanea.
                             if (settingsManager.profiles.value.none { it.serverUrl == serverUrl }) {
                                 settingsManager.addProfile(label = serverLabel.ifBlank { context.getString(R.string.cloud) }, serverUrl = serverUrl.trim(), email = context.getString(R.string.da_configurare))
                             }
@@ -607,9 +580,6 @@ private fun ModeSelectionCard(icon: ImageVector, title: String, subtitle: String
     }
 }
 
-// ─────────────────────────────────────────────
-// Page 4 — Triggers Overview (Senza Wi-Fi)
-// ─────────────────────────────────────────────
 @Composable
 private fun TriggersOverviewPage(onNext: () -> Unit) {
     InfoPage(
@@ -622,9 +592,6 @@ private fun TriggersOverviewPage(onNext: () -> Unit) {
     )
 }
 
-// ─────────────────────────────────────────────
-// Shared Composables & Remaining Pages
-// ─────────────────────────────────────────────
 data class PermDetail(val icon: ImageVector, val text: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -803,9 +770,6 @@ private fun AllDonePage(hasFineLoc: Boolean, hasBgLoc: Boolean, hasBt: Boolean, 
     }
 }
 
-// ─────────────────────────────────────────────
-// Generic/Shared UI
-// ─────────────────────────────────────────────
 data class InfoStep(val icon: ImageVector, val color: Color, val heading: String, val body: String)
 
 @Composable
