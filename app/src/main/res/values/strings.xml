@@ -342,4 +342,22 @@
     <string name="posizione_salvata_per">Location saved for %1$s!</string>
     <string name="elimina_veicolo_titolo">Delete vehicle</string>
     <string name="elimina_veicolo_descrizione">Are you sure you want to delete \"%1$s\"? This action cannot be undone.</string>
+
+    <string name="log_posizioni">Location History</string>
+    <string name="log_posizioni_titolo">Location Logs</string>
+    <string name="nessun_log_disponibile">No logs available</string>
+    <string name="carica_precedenti">Load older</string>
+    <string name="impostazioni_log">Log Settings</string>
+    <string name="abilita_salvataggio">Enable saving</string>
+    <string name="desc_abilita_salvataggio">Record location history</string>
+    <string name="conservazione_giorni">Retention: %1$d days</string>
+    <string name="salva_impostazioni">Save Settings</string>
+    <string name="filtra_per_utente">Filter by User</string>
+    <string name="tutti_gli_utenti">All users</string>
+    <string name="applica_filtri">Apply Filters</string>
+    <string name="app_non_trovata">No navigation app found</string>
+    <string name="conferma_gps_titolo">Update location</string>
+    <string name="conferma_gps_testo">Are you sure you want to overwrite the current vehicle position using your current GPS location?</string>
+    <string name="filtra_per_data">Filter by Date</string>
+    <string name="tutte_le_date">All dates</string>
 </resources>

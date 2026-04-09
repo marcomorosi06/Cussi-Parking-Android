@@ -1,9 +1,3 @@
-/*
- * HomeScreen.kt — Material 3 Expressive Rewrite
- * - VehicleCard: struttura rinnovata, più pulita e gerarchica
- * - BottomSheet: animazioni di ingresso/uscita espressive con spring
- * Full feature parity maintained.
- */
 package com.cuscus.cussiparking.ui.home
 
 import android.Manifest
@@ -72,6 +66,8 @@ import androidx.core.graphics.drawable.DrawableCompat
 import com.cuscus.cussiparking.ui.settings.MapProvider
 import com.cuscus.cussiparking.ui.settings.MapThemeMode
 import org.osmdroid.tileprovider.tilesource.ITileSource
+import android.annotation.SuppressLint
+import androidx.compose.foundation.shape.CircleShape
 
 private fun createMaterialMarkerDrawable(
     context: android.content.Context,
@@ -160,7 +156,8 @@ fun HomeScreen(
     onLogout: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToMembers: (vehicleServerId: Int, vehicleName: String, profileId: String) -> Unit,
-    onNavigateToTriggers: (vehicleId: Int, vehicleName: String) -> Unit
+    onNavigateToTriggers: (vehicleId: Int, vehicleName: String) -> Unit,
+    onNavigateToLogs: (Int, String, Boolean) -> Unit
 ) {
     val context         = LocalContext.current
     val app             = context.applicationContext as CussiParkingApplication
@@ -326,7 +323,12 @@ fun HomeScreen(
                                                     onNavigateToMembers(sid, vehicle.name, pid)
                                                 }
                                             },
-                                            onManageTriggers = { onNavigateToTriggers(vehicle.id, vehicle.name) }
+                                            onManageTriggers = { onNavigateToTriggers(vehicle.id, vehicle.name) },
+                                            onLogsClick = {
+                                                if (vehicle.serverId != null) {
+                                                    onNavigateToLogs(vehicle.serverId!!, vehicle.serverProfileId ?: "", vehicle.role == "owner")
+                                                }
+                                            }
                                         )
                                     }
                                 }
@@ -550,24 +552,27 @@ private fun StatusBanner(
 // ─────────────────────────────────────────────
 @Composable
 fun VehicleCard(
-    vehicle: Vehicle,
+    vehicle: com.cuscus.cussiparking.network.Vehicle,
     showServerBadge: Boolean,
     onParkGps: (Double, Double) -> Unit,
     onParkMap: () -> Unit,
     onDelete: () -> Unit,
     onManageMembers: () -> Unit,
-    onManageTriggers: () -> Unit
+    onManageTriggers: () -> Unit,
+    onLogsClick: () -> Unit
 ) {
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     val isOwner = vehicle.role == "owner"
     val isLocalOnly = vehicle.serverId == null
+    var showGpsConfirmDialog by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { perms ->
         if (perms[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
             try {
+                @SuppressLint("MissingPermission")
                 fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
                     if (loc != null) onParkGps(loc.latitude, loc.longitude)
                 }
@@ -575,7 +580,6 @@ fun VehicleCard(
         }
     }
 
-    // Colori ridotti all'essenziale: solo per i dettagli, niente container giganti
     val syncInfo: SyncInfo = when {
         isLocalOnly -> SyncInfo(
             iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -601,25 +605,21 @@ fun VehicleCard(
 
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp), // Arrotondamento classico e sobrio
+        shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column {
-            // ══════════════════════════════════════════
-            // 1. HEADER — Pulito e minimale
-            // ══════════════════════════════════════════
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Avatar circolare classico
                 Surface(
-                    shape = androidx.compose.foundation.shape.CircleShape,
+                    shape = CircleShape,
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
                     modifier = Modifier.size(48.dp)
                 ) {
@@ -644,7 +644,6 @@ fun VehicleCard(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
 
-                    // Info di stato puramente testuale con icona colorata
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = syncInfo.icon,
@@ -669,20 +668,19 @@ fun VehicleCard(
                     }
                 }
 
-                // Azioni rapide spostate in alto a destra per pulizia
                 Row(horizontalArrangement = Arrangement.End) {
                     IconButton(onClick = onManageTriggers) {
-                        Icon(Icons.Default.AutoMode, contentDescription = stringResource(R.string.trigger), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(
+                            Icons.Default.AutoMode,
+                            contentDescription = stringResource(R.string.trigger),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
-                    // Menu a tendina o altre azioni potrebbero andare qui
                 }
             }
 
             HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
 
-            // ══════════════════════════════════════════
-            // 2. CORE — Navigazione e Cronologia
-            // ══════════════════════════════════════════
             Box(modifier = Modifier.padding(16.dp)) {
                 if (vehicle.lat != null && vehicle.lng != null) {
                     Column {
@@ -698,20 +696,14 @@ fun VehicleCard(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
 
-                            val histLabel = buildString {
-                                if (!vehicle.lastUpdatedBy.isNullOrBlank()) {
-                                    append(stringResource(R.string.aggiornato_da, vehicle.lastUpdatedBy))
-                                } else {
-                                    append(stringResource(R.string.posizione_registrata))
-                                }
+                            val updatedByStr = vehicle.lastUpdatedBy?.let { stringResource(R.string.aggiornato_da, it) } ?: stringResource(R.string.posizione_registrata)
+                            val updatedAtStr = vehicle.updatedAt?.let {
+                                val fmt = SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault())
+                                stringResource(R.string.aggiornato_il, fmt.format(Date(it * 1000)))
+                            } ?: ""
 
-                                vehicle.updatedAt?.let {
-                                    val fmt = SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault())
-                                    append(stringResource(R.string.aggiornato_il, fmt.format(Date(it * 1000))))
-                                }
-                            }
                             Text(
-                                text = histLabel,
+                                text = "$updatedByStr $updatedAtStr",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -721,7 +713,7 @@ fun VehicleCard(
                             onClick = {
                                 val uri = Uri.parse("geo:${vehicle.lat},${vehicle.lng}?q=${vehicle.lat},${vehicle.lng}(${Uri.encode(vehicle.name)})")
                                 try { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) }
-                                catch (_: Exception) { Toast.makeText(context, "No app found.", Toast.LENGTH_SHORT).show() }
+                                catch (_: Exception) { Toast.makeText(context, context.getString(R.string.app_non_trovata), Toast.LENGTH_SHORT).show() }
                             },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
@@ -754,9 +746,6 @@ fun VehicleCard(
 
             HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, thickness = 1.dp)
 
-            // ══════════════════════════════════════════
-            // 3. TOOLBAR INFERIORE — Pulsanti chiari e separati
-            // ══════════════════════════════════════════
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -764,14 +753,15 @@ fun VehicleCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Pulsanti aggiornamento posizione
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilledTonalButton(
                         onClick = {
                             val ok = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                            if (ok) fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
-                                if (loc != null) onParkGps(loc.latitude, loc.longitude)
-                            } else permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
+                            if (ok) {
+                                showGpsConfirmDialog = true
+                            } else {
+                                permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
+                            }
                         },
                         shape = RoundedCornerShape(8.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp)
@@ -792,9 +782,11 @@ fun VehicleCard(
                     }
                 }
 
-                // Azioni secondarie (Membri/Elimina)
                 Row {
                     if (!isLocalOnly) {
+                        IconButton(onClick = onLogsClick) {
+                            Icon(Icons.Default.History, contentDescription = stringResource(R.string.log_posizioni), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                         IconButton(onClick = onManageMembers) {
                             Icon(Icons.Default.Group, contentDescription = stringResource(R.string.membri), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
@@ -808,9 +800,32 @@ fun VehicleCard(
             }
         }
     }
+    if (showGpsConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showGpsConfirmDialog = false },
+            title = { Text(stringResource(R.string.conferma_gps_titolo)) },
+            text = { Text(stringResource(R.string.conferma_gps_testo)) },
+            confirmButton = {
+                Button(onClick = {
+                    showGpsConfirmDialog = false
+                    @SuppressLint("MissingPermission")
+                    fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
+                        if (loc != null) onParkGps(loc.latitude, loc.longitude)
+                    }
+                }) {
+                    Text(stringResource(R.string.conferma))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showGpsConfirmDialog = false }) {
+                    Text(stringResource(R.string.annulla))
+                }
+            }
+        )
+    }
 }
 
-// Helper data class semplificata
+// Helper data class
 private data class SyncInfo(
     val iconTint: Color,
     val icon: ImageVector,
@@ -818,7 +833,7 @@ private data class SyncInfo(
 )
 
 // ─────────────────────────────────────────────
-// StatusChip — pill compatta (rimpiazza MicroBadge)
+// StatusChip
 // ─────────────────────────────────────────────
 @Composable
 private fun StatusChip(
@@ -1219,9 +1234,9 @@ fun JoinByCodeBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapSelectionOverlay(
-    vehicle: Vehicle,
-    otherVehicles: List<Vehicle>,
-    settingsManager: SettingsManager,
+    vehicle: com.cuscus.cussiparking.network.Vehicle,
+    otherVehicles: List<com.cuscus.cussiparking.network.Vehicle>,
+    settingsManager: com.cuscus.cussiparking.data.SettingsManager,
     onSave: (Double, Double) -> Unit,
     onCancel: () -> Unit
 ) {
@@ -1237,13 +1252,11 @@ fun MapSelectionOverlay(
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     val markerColorArgb = MaterialTheme.colorScheme.tertiary.toArgb()
 
-    // ── STATI PER MENU MAPPA ──
     var mapProvider by remember { mutableStateOf(MapProvider.CARTO) }
-    var mapThemeMode by remember { mutableStateOf(MapThemeMode.SYSTEM) }
+    var mapThemeMode by remember { mutableStateOf(MapThemeMode.LIGHT) }
     var showProviderMenu by remember { mutableStateOf(false) }
     var showThemeMenu by remember { mutableStateOf(false) }
 
-    // ── ANIMAZIONE DEL PIN CENTRALE ──
     var isMapMoving by remember { mutableStateOf(false) }
     var mapInteractionCount by remember { mutableIntStateOf(0) }
 
@@ -1267,7 +1280,6 @@ fun MapSelectionOverlay(
         label = "shadowscale"
     )
 
-    // ── GESTIONE DINAMICA TILES ──
     val isSystemDark = androidx.compose.foundation.isSystemInDarkTheme()
     val isDarkMap = when (mapThemeMode) {
         MapThemeMode.SYSTEM -> isSystemDark
@@ -1295,7 +1307,7 @@ fun MapSelectionOverlay(
                     }
                 }
             }
-            MapProvider.OSM -> TileSourceFactory.MAPNIK // OSM Standard non ha un tema scuro nativo
+            MapProvider.OSM -> TileSourceFactory.MAPNIK
         }
     }
 
@@ -1312,6 +1324,7 @@ fun MapSelectionOverlay(
             }
             "gps" -> {
                 if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    @SuppressLint("MissingPermission")
                     fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
                         if (loc != null) {
                             val p = GeoPoint(loc.latitude, loc.longitude); currentMapCenter = p
@@ -1326,13 +1339,13 @@ fun MapSelectionOverlay(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.dove_veicolo, vehicle.name), fontWeight = FontWeight.Bold) },                navigationIcon = {
+                title = { Text(stringResource(R.string.dove_veicolo, vehicle.name), fontWeight = FontWeight.Bold) },
+                navigationIcon = {
                     IconButton(onClick = onCancel) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.annulla))
                     }
                 },
                 actions = {
-                    // Menu Tema
                     Box {
                         IconButton(onClick = { showThemeMenu = true }) {
                             Icon(
@@ -1358,7 +1371,6 @@ fun MapSelectionOverlay(
                         }
                     }
 
-                    // Menu Provider
                     Box {
                         IconButton(onClick = { showProviderMenu = true }) {
                             Icon(Icons.Default.Layers, contentDescription = stringResource(R.string.stile_mappa))
@@ -1385,7 +1397,6 @@ fun MapSelectionOverlay(
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
 
-            // ── MAPPA ──
             AndroidView(
                 modifier = Modifier.fillMaxSize(),
                 factory = { ctx ->
@@ -1410,10 +1421,9 @@ fun MapSelectionOverlay(
                     }
                 },
                 update = { mapView ->
-                    // Fondamentale per aggiornare il provider al volo senza ricreare la View
                     mapView.setTileSource(currentTileSource)
-
                     mapView.overlays.clear()
+
                     val modernMarkerIcon = createMaterialMarkerDrawable(context, markerColorArgb)
 
                     otherVehicles.forEach { v ->
@@ -1431,11 +1441,9 @@ fun MapSelectionOverlay(
                 }
             )
 
-            // ── PIN CENTRALE ANIMATO ──
             Box(
                 modifier = Modifier.align(Alignment.Center)
             ) {
-                // Ombra dinamica
                 Box(
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -1445,7 +1453,6 @@ fun MapSelectionOverlay(
                         .background(Color.Black.copy(alpha = 0.2f), shape = RoundedCornerShape(50))
                 )
 
-                // Icona Pin
                 Icon(
                     Icons.Default.LocationOn,
                     contentDescription = stringResource(R.string.puntatore),
@@ -1457,14 +1464,12 @@ fun MapSelectionOverlay(
                 )
             }
 
-            // ── CONTROLLI EXPRESSIVE (In basso) ──
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(horizontal = 20.dp, vertical = 32.dp)
                     .fillMaxWidth()
             ) {
-                // Coordinate eleganti centrate in alto
                 Surface(
                     shape = RoundedCornerShape(16.dp),
                     color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f),
@@ -1482,13 +1487,11 @@ fun MapSelectionOverlay(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Layout asimmetrico bottoni
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    // Azioni secondarie (Mappa e Ricerca)
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         SmallFloatingActionButton(
                             onClick = { showManualInput = true },
@@ -1502,6 +1505,7 @@ fun MapSelectionOverlay(
                         SmallFloatingActionButton(
                             onClick = {
                                 if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                    @SuppressLint("MissingPermission")
                                     fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
                                         if (loc != null) mapViewReference?.controller?.animateTo(GeoPoint(loc.latitude, loc.longitude))
                                     }
@@ -1517,13 +1521,12 @@ fun MapSelectionOverlay(
                         }
                     }
 
-                    // Azione primaria (Conferma) bella grossa ed espressiva
                     ExtendedFloatingActionButton(
                         onClick = { onSave(currentMapCenter.latitude, currentMapCenter.longitude) },
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary,
-                        shape = RoundedCornerShape(24.dp), // Forma organica e smussata
-                        modifier = Modifier.height(72.dp) // Altezza maggiorata stile M3
+                        shape = RoundedCornerShape(24.dp),
+                        modifier = Modifier.height(72.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(24.dp))
@@ -1534,7 +1537,6 @@ fun MapSelectionOverlay(
                 }
             }
 
-            // ── DIALOG INPUT MANUALE (invariato o quasi) ──
             if (showManualInput) {
                 var inputLat by remember { mutableStateOf("") }
                 var inputLng by remember { mutableStateOf("") }
@@ -1585,7 +1587,6 @@ fun MapSelectionOverlay(
         }
     }
 }
-
 // ─────────────────────────────────────────────
 // Bouncy Icon Button (shared)
 // ─────────────────────────────────────────────

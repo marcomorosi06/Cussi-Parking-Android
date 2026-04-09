@@ -3,6 +3,7 @@ package com.cuscus.cussiparking.network
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface CussiParkingApi {
@@ -100,4 +101,27 @@ interface CussiParkingApi {
         @Field("vehicle_id") vehicleId: Int? = null,
         @Field("code") code: String? = null
     ): Response<InviteCodeResponse>
+
+    @Headers("X-App-Request: CussiParking")
+    @FormUrlEncoded
+    @POST("get_logs.php")
+    suspend fun getLogs(
+        @Field("token") token: String,
+        @Field("vehicle_id") vehicleId: Int,
+        @Field("limit") limit: Int = 100,
+        @Field("offset") offset: Int = 0,
+        @Field("date_from") dateFrom: Long? = null,
+        @Field("date_to") dateTo: Long? = null,
+        @Field("user_id") userId: Int? = null
+    ): Response<GetLogsResponse>
+
+    @Headers("X-App-Request: CussiParking")
+    @FormUrlEncoded
+    @POST("toggle_logs.php")
+    suspend fun toggleLogs(
+        @Field("token") token: String,
+        @Field("vehicle_id") vehicleId: Int,
+        @Field("logs_enabled") logsEnabled: Int,
+        @Field("retention_days") retentionDays: Int
+    ): Response<ToggleLogsResponse>
 }

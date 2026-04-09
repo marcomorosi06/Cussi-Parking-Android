@@ -56,3 +56,34 @@ data class InviteCodeResponse(
     @SerializedName("vehicle_id") val vehicleId: Int? = null,
     @SerializedName("vehicle_name") val vehicleName: String? = null
 )
+
+data class LocationLog(
+    val id: Int,
+    val lat: Double,
+    val lng: Double,
+    @SerializedName("saved_at") val savedAt: Long,
+    @SerializedName("user_id") val userId: Int,
+    @SerializedName("saved_by") val savedBy: String
+)
+
+data class LogMember(
+    val id: Int,
+    val username: String
+)
+
+data class GetLogsResponse(
+    val status: String,
+    val total: Int? = null,
+    val limit: Int? = null,
+    val offset: Int? = null,
+    val members: List<LogMember>? = null,
+    val data: List<LocationLog>? = null,
+    val message: String? = null
+)
+
+data class ToggleLogsResponse(
+    val status: String,
+    val message: String? = null,
+    @SerializedName("logs_enabled") val logsEnabled: Boolean? = null,
+    @SerializedName("retention_days") val retentionDays: Int? = null
+)

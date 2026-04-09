@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
-import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.cuscus.cussiparking.CussiParkingApplication
 import com.google.android.gms.location.LocationServices
@@ -40,7 +39,6 @@ class ParkingLocationWorker(
 
         if (vehicleId == -1) return Result.failure()
 
-        // Log permessi per debug
         val hasFine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         val hasBackground = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
         Log.d(TAG, "Permessi — ACCESS_FINE_LOCATION=$hasFine, ACCESS_BACKGROUND_LOCATION=$hasBackground")
@@ -48,8 +46,8 @@ class ParkingLocationWorker(
         val app = context.applicationContext as CussiParkingApplication
 
         val location = when (locationMode) {
-            "precise" -> getPreciseLocation(vehicleId, hasBackground)
-            else      -> getLastKnownLocation(vehicleId)
+            "precise" -> getPreciseLocation(vehicleId, hasBackground, locationMode)
+            else      -> getLastKnownLocation(vehicleId, locationMode)
         }
 
         Log.d(TAG, "Posizione finale: $location")
@@ -62,7 +60,6 @@ class ParkingLocationWorker(
         val result = app.repository.updateLocation(vehicleId, location.first, location.second)
         Log.d(TAG, "updateLocation: isSuccess=${result.isSuccess}")
 
-        // Determina la sorgente dal triggerLabel (es. "Bluetooth: vivavoce auto" → SOURCE_BLUETOOTH)
         val source = when {
             triggerLabel.startsWith("Bluetooth", ignoreCase = true) -> ParkingNotificationHelper.SOURCE_BLUETOOTH
             triggerLabel.startsWith("NFC",        ignoreCase = true) -> ParkingNotificationHelper.SOURCE_NFC
@@ -83,7 +80,7 @@ class ParkingLocationWorker(
                 source       = source,
                 triggerLabel = displayLabel
             )
-            Log.d(TAG, "✓ Parcheggio automatico completato per $vehicleName")
+            Log.d(TAG, "Parcheggio automatico completato per $vehicleName")
             Result.success()
         } else {
             Log.e(TAG, "updateLocation fallito: ${result.exceptionOrNull()?.message}")
@@ -97,27 +94,23 @@ class ParkingLocationWorker(
         }
     }
 
-    private suspend fun getPreciseLocation(vehicleId: Int, hasBackgroundPerm: Boolean): Pair<Double, Double>? {
+    private suspend fun getPreciseLocation(vehicleId: Int, hasBackgroundPerm: Boolean, locationMode: String): Pair<Double, Double>? {
         if (!hasBackgroundPerm) {
-            // Senza ACCESS_BACKGROUND_LOCATION getCurrentLocation() non funziona in background
-            Log.w(TAG, "ACCESS_BACKGROUND_LOCATION non concesso — uso lastKnown come fallback")
-            return getLastKnownLocation(vehicleId)
+            Log.w(TAG, "ACCESS_BACKGROUND_LOCATION non concesso")
+            return getLastKnownLocation(vehicleId, locationMode)
         }
 
         return try {
             val fusedClient = LocationServices.getFusedLocationProviderClient(context)
             val cts = CancellationTokenSource()
 
-            Log.d(TAG, "Richiedo GPS preciso (getCurrentLocation, timeout 15s)…")
             val loc = withTimeoutOrNull(15_000) {
                 suspendCancellableCoroutine { cont ->
                     fusedClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cts.token)
                         .addOnSuccessListener { location ->
-                            Log.d(TAG, "getCurrentLocation success: $location")
                             if (cont.isActive) cont.resume(location) {}
                         }
-                        .addOnFailureListener { e ->
-                            Log.w(TAG, "getCurrentLocation failure: ${e.message}")
+                        .addOnFailureListener {
                             if (cont.isActive) cont.resume(null) {}
                         }
                     cont.invokeOnCancellation { cts.cancel() }
@@ -125,50 +118,47 @@ class ParkingLocationWorker(
             }
 
             if (loc != null) {
-                Log.d(TAG, "GPS preciso OK: lat=${loc.latitude}, lng=${loc.longitude}, accuracy=${loc.accuracy}m")
                 Pair(loc.latitude, loc.longitude)
             } else {
-                Log.w(TAG, "GPS preciso timeout (15s), fallback a lastKnown")
-                getLastKnownLocation(vehicleId)
+                getLastKnownLocation(vehicleId, locationMode)
             }
         } catch (e: SecurityException) {
-            Log.w(TAG, "SecurityException GPS preciso: ${e.message}, fallback a lastKnown")
-            getLastKnownLocation(vehicleId)
+            getLastKnownLocation(vehicleId, locationMode)
         }
     }
 
-    private suspend fun getLastKnownLocation(vehicleId: Int): Pair<Double, Double>? {
-        // Tentativo 1: lastLocation da FusedLocationProvider
+    private suspend fun getLastKnownLocation(vehicleId: Int, locationMode: String): Pair<Double, Double>? {
         try {
-            val fusedClient = LocationServices.getFusedLocationProviderClient(context)
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+            val priority = if (locationMode == "precise") Priority.PRIORITY_HIGH_ACCURACY else Priority.PRIORITY_BALANCED_POWER_ACCURACY
             val loc = suspendCancellableCoroutine<android.location.Location?> { cont ->
-                fusedClient.lastLocation.addOnCompleteListener { task ->
-                    Log.d(TAG, "lastLocation: success=${task.isSuccessful}, result=${task.result}")
-                    if (cont.isActive) cont.resume(task.result) {}
-                }
+                val cancellationTokenSource = CancellationTokenSource()
+                fusedLocationClient.getCurrentLocation(priority, cancellationTokenSource.token)
+                    .addOnSuccessListener { location ->
+                        if (cont.isActive) cont.resume(location) {}
+                    }
+                    .addOnFailureListener {
+                        if (cont.isActive) cont.resume(null) {}
+                    }
+                cont.invokeOnCancellation { cancellationTokenSource.cancel() }
             }
+
             if (loc != null) {
-                Log.d(TAG, "lastLocation OK: lat=${loc.latitude}, lng=${loc.longitude}, accuracy=${loc.accuracy}m, age=${(System.currentTimeMillis() - loc.time) / 1000}s")
                 return Pair(loc.latitude, loc.longitude)
             }
-            Log.w(TAG, "lastLocation null — FusedProvider non ha posizioni recenti")
         } catch (e: SecurityException) {
-            Log.w(TAG, "SecurityException lastLocation: ${e.message}")
+            Log.w(TAG, "SecurityException: ${e.message}")
         }
 
-        // Tentativo 2: coordinate salvate nel DB locale (ultimo parcheggio manuale)
         return try {
             val app = context.applicationContext as CussiParkingApplication
             val vehicle = app.database.vehicleDao().getVehicleById(vehicleId)
             if (vehicle?.lat != null && vehicle.lng != null) {
-                Log.w(TAG, "⚠ Usando coordinate DB (ultimo parcheggio noto): lat=${vehicle.lat}, lng=${vehicle.lng}")
                 Pair(vehicle.lat, vehicle.lng)
             } else {
-                Log.e(TAG, "Nessuna coordinata disponibile per vehicleId=$vehicleId")
                 null
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Errore lettura DB: ${e.message}")
             null
         }
     }

@@ -342,4 +342,22 @@
     <string name="posizione_salvata_per">Posizione salvata per %1$s!</string>
     <string name="elimina_veicolo_titolo">Elimina veicolo</string>
     <string name="elimina_veicolo_descrizione">Sei sicuro di voler eliminare \"%1$s\"? Questa azione non può essere annullata.</string>
+
+    <string name="log_posizioni">Cronologia Posizioni</string>
+    <string name="log_posizioni_titolo">Log Posizioni</string>
+    <string name="nessun_log_disponibile">Nessun log disponibile</string>
+    <string name="carica_precedenti">Carica precedenti</string>
+    <string name="impostazioni_log">Impostazioni Log</string>
+    <string name="abilita_salvataggio">Abilita salvataggio</string>
+    <string name="desc_abilita_salvataggio">Registra la cronologia delle posizioni</string>
+    <string name="conservazione_giorni">Conservazione: %1$d giorni</string>
+    <string name="salva_impostazioni">Salva Impostazioni</string>
+    <string name="filtra_per_utente">Filtra per Utente</string>
+    <string name="tutti_gli_utenti">Tutti gli utenti</string>
+    <string name="applica_filtri">Applica Filtri</string>
+    <string name="app_non_trovata">Nessuna app di navigazione trovata</string>
+    <string name="conferma_gps_titolo">Aggiorna posizione</string>
+    <string name="conferma_gps_testo">Sei sicuro di voler sovrascrivere la posizione attuale del veicolo usando la tua posizione GPS attuale?</string>
+    <string name="filtra_per_data">Filtra per Data</string>
+    <string name="tutte_le_date">Tutte le date</string>
 </resources>

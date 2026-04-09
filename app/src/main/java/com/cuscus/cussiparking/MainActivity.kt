@@ -34,6 +34,8 @@ import com.cuscus.cussiparking.ui.triggers.VehicleTriggersScreen
 import com.cuscus.cussiparking.ui.triggers.VehicleTriggersViewModel
 import com.cuscus.cussiparking.ui.welcome.WelcomeScreen
 import androidx.lifecycle.lifecycleScope
+import com.cuscus.cussiparking.ui.logs.VehicleLogsScreen
+import com.cuscus.cussiparking.ui.logs.VehicleLogsViewModel
 import com.cuscus.cussiparking.ui.triggers.UnknownNfcTagBottomSheet
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
@@ -103,6 +105,9 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToTriggers = { vehicleId, vehicleName ->
                                     val encodedName = URLEncoder.encode(vehicleName, "UTF-8")
                                     navController.navigate("triggers/$vehicleId/$encodedName")
+                                },
+                                onNavigateToLogs = { vehicleId, profileId, isOwner ->
+                                    navController.navigate("logs/$vehicleId?profileId=$profileId&isOwner=$isOwner")
                                 }
                             )
                         }
@@ -230,6 +235,26 @@ class MainActivity : ComponentActivity() {
                                         popUpTo("welcome") { inclusive = true }
                                     }
                                 }
+                            )
+                        }
+
+                        // ==========================================
+                        // VEHICLES LOGS
+                        // ==========================================
+                        composable("logs/{vehicleId}?profileId={profileId}&isOwner={isOwner}") { backStackEntry ->
+                            val vId = backStackEntry.arguments?.getString("vehicleId")?.toIntOrNull() ?: return@composable
+                            val pId = backStackEntry.arguments?.getString("profileId") ?: ""
+                            val isOwner = backStackEntry.arguments?.getString("isOwner")?.toBoolean() ?: false
+
+                            val context = androidx.compose.ui.platform.LocalContext.current
+                            val app = context.applicationContext as CussiParkingApplication
+
+                            val viewModel: com.cuscus.cussiparking.ui.logs.VehicleLogsViewModel = viewModel(
+                                factory = com.cuscus.cussiparking.ui.logs.VehicleLogsViewModel.Factory(app.repository, pId, vId, isOwner)
+                            )
+                            com.cuscus.cussiparking.ui.logs.VehicleLogsScreen(
+                                viewModel = viewModel,
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
                     }

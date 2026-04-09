@@ -298,4 +298,37 @@ class CussiParkingRepository(
             else throw Exception(body?.message ?: "Codice non valido")
         } catch (e: Exception) { Result.failure(Exception(e.message ?: "Errore di rete")) }
     }
+
+    suspend fun getLogs(
+        profileId: String,
+        vehicleServerId: Int,
+        limit: Int = 100,
+        offset: Int = 0,
+        dateFrom: Long? = null,
+        dateTo: Long? = null,
+        userId: Int? = null
+    ): Result<GetLogsResponse> {
+        return try {
+            val (api, token) = getApiAndToken(profileId) ?: throw Exception("Non autenticato.")
+            val response = api.getLogs(token, vehicleServerId, limit, offset, dateFrom, dateTo, userId)
+            val body = response.body()
+            if (response.isSuccessful && body?.status == "success") Result.success(body)
+            else throw Exception(body?.message ?: "Errore caricamento log")
+        } catch (e: Exception) { Result.failure(Exception(e.message ?: "Errore di rete")) }
+    }
+
+    suspend fun toggleLogs(
+        profileId: String,
+        vehicleServerId: Int,
+        enabled: Boolean,
+        retentionDays: Int
+    ): Result<ToggleLogsResponse> {
+        return try {
+            val (api, token) = getApiAndToken(profileId) ?: throw Exception("Non autenticato.")
+            val response = api.toggleLogs(token, vehicleServerId, if (enabled) 1 else 0, retentionDays)
+            val body = response.body()
+            if (response.isSuccessful && body?.status == "success") Result.success(body)
+            else throw Exception(body?.message ?: "Errore modifica log")
+        } catch (e: Exception) { Result.failure(Exception(e.message ?: "Errore di rete")) }
+    }
 }
